@@ -31,7 +31,7 @@ Event organizers can efficiently create, manage, and update their listings, stre
 | user_created        | timestamp                         | 18           | -             | Stores the date and time when the user account was created |
 | user_last_updated   | timestamp                         | 18           | -             | Stores the date and time when the user profile was last updated |
 
-## User_Roles Entity
+## User Roles Entity
 
 | Field Name | Data Type | Field Length | Constraints   | Description |
 |------------|----------|--------------|--------------|-------------|
@@ -53,7 +53,7 @@ Event organizers can efficiently create, manage, and update their listings, stre
 | event_created    | Timestamp | -           | DEFAULT CURRENT_TIMESTAMP           | Date and time when the event was created |
 | event_last_updated | Timestamp | -         | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Date and time when the event details were last updated |
 
-## Event_registration Entity
+## Event Registration Entity
 
 | Field Name            | Data Type | Field Length | Constraints                           | Description |
 |-----------------------|----------|--------------|--------------------------------------|-------------|
