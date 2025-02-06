@@ -12,11 +12,14 @@ Event organizers can efficiently create, manage, and update their listings, stre
 
 
 # Entity Relationship Diagram
+This ERD diagram models the database structure for Tally Connect, outlining entities such as users, events, registrations, disputes, and analytics, and their relationships to support efficient event coordination and user management.
+
 <img width="857" alt="Screenshot 2025-02-05 at 9 08 24 AM" src="https://github.com/user-attachments/assets/b2dd26e2-9908-4753-beeb-920945d056a8" />
 
 
 
 # Data Dictionary
+This data dictionary defines the structure, attributes, and constraints of the Tally Connect database.
 
 ## User Entity
 
