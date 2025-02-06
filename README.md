@@ -12,7 +12,8 @@ Event organizers can efficiently create, manage, and update their listings, stre
 
 
 # Entity Relationship Diagram
-![tallyconnectERD](https://github.com/user-attachments/assets/e6a5bcf5-22f6-47f7-902e-125c1c142b76)
+<img width="857" alt="Screenshot 2025-02-05 at 9 08 24 AM" src="https://github.com/user-attachments/assets/b2dd26e2-9908-4753-beeb-920945d056a8" />
+
 
 # Data Dictionary
 # Data Dictionary
