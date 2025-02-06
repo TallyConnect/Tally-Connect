@@ -1,4 +1,4 @@
-# Tally-Connect
+# Tally Connect
 ## Table of Contents
 - [About the Project](#about-the-project)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
