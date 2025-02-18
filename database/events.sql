@@ -1,0 +1,2 @@
+CREATE table EVENTS; 
+eklvjnekwlnv
