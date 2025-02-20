@@ -9,3 +9,6 @@ CREATE TABLE warnings (
     FOREIGN KEY (user_id) REFERENCES users (user_id),
     FOREIGN KEY (warning_issued_by) REFERENCES users (user_id)
 );
+
+INSERT INTO warnings (user_id, warning_reason, warning_status, warning_issued_by, warning_date_issued, warning_resolution) VALUES
+(1, 'Inappropriate content', 'yellow', 2, CURRENT_TIMESTAMP, FALSE);

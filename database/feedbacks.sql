@@ -8,3 +8,6 @@ CREATE TABLE feedback (
     FOREIGN KEY (event_id) REFERENCES events (event_id),
     FOREIGN KEY (participant_id) REFERENCES users (user_id)
 );
+
+INSERT INTO feedback (event_id, participant_id, feedback_rating, feedback_comments, feedback_date_submitted) VALUES
+('E001', 2, 5, 'Great event!', CURRENT_TIMESTAMP);

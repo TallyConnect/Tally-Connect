@@ -6,3 +6,6 @@ CREATE TABLE analytics_reports (
     report_data JSON,
     FOREIGN KEY (generated_by) REFERENCES users (user_id)
 );
+
+INSERT INTO analytics_reports (generated_by, report_date, report_type, report_data) VALUES
+(1, CURRENT_TIMESTAMP, 'event', '{ "event": "Community BBQ", "participants": 50 }');

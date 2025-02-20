@@ -7,3 +7,6 @@ CREATE TABLE Event_registration (
     CONSTRAINT fk_event FOREIGN KEY (event_id) REFERENCES events(event_id),
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
+INSERT INTO event_registrations (event_id, participant_id, registration_status, registration_created) VALUES
+('E001', 2, TRUE, CURRENT_TIMESTAMP);

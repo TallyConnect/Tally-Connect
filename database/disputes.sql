@@ -10,3 +10,6 @@ CREATE TABLE disputes (
     FOREIGN KEY (event_id) REFERENCES events (event_id),
     FOREIGN KEY (moderator_id) REFERENCES users (user_id)
 );
+
+INSERT INTO disputes (raised_by, event_id, moderator_id, dispute_status, dispute_resolution, dispute_date_resolved) VALUES
+(2, 'E001', 1, 'resolved', 'Issue resolved amicably.', CURRENT_TIMESTAMP);

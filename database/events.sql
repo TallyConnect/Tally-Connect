@@ -11,3 +11,6 @@ CREATE TABLE EVENTS (
     event_last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
+
+INSERT INTO events (event_id, organizer_id, event_title, event_description, event_location, event_date, event_time, event_status, event_created, event_last_updated) VALUES
+('E001', 1, 'Community BBQ', 'A fun BBQ event for the neighborhood', 'Central Park', '2025-03-01', '12:00:00', 'Scheduled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
