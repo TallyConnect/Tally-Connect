@@ -9,4 +9,6 @@ CREATE TABLE Event_registration (
 );
 
 INSERT INTO event_registrations (event_id, participant_id, registration_status, registration_created) VALUES
-('E001', 2, TRUE, CURRENT_TIMESTAMP);
+('E001', 2, TRUE, CURRENT_TIMESTAMP),
+('E1002', 1, TRUE), ('E1002', 3, TRUE),
+('E1003', 2, TRUE), ('E1003', 3, TRUE);

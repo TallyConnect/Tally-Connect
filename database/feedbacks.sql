@@ -11,3 +11,7 @@ CREATE TABLE feedback (
 
 INSERT INTO feedback (event_id, participant_id, feedback_rating, feedback_comments, feedback_date_submitted) VALUES
 ('E001', 2, 5, 'Great event!', CURRENT_TIMESTAMP);
+
+INSERT INTO feedback (event_id, user_id, feedback_rating, feedback_comments) VALUES
+('E1001', 1, 5, 'Great study session, very helpful!'),
+('E1002', 3, 4, 'The Back to School event was well-organized.');

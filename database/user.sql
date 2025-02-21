@@ -13,3 +13,6 @@ CREATE TABLE users(
 INSERT INTO users (user_name, user_email, user_password, user_contact_details, user_preferences, user_status, user_created, user_last_updated) VALUES
 ('JohnDoe', 'john@example.com', 'password123', '555-1234, john.alt@example.com', 'Sports, Music', 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('JaneSmith', 'jane@example.com', 'password456', '555-5678, jane.alt@example.com', 'Cooking, Travel', 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+('Alice Johnson', 'alice.johnson@example.com', 'hashed_password1', '123-456-7890', 'Networking, Volunteering', 'Active'),
+('Bob Smith', 'bob.smith@example.com', 'hashed_password2', '987-654-3210', 'Workshops, Tech Events', 'Active'),
+('Charlie Davis', 'charlie.davis@example.com', 'hashed_password3', '555-123-4567', 'Outdoor Events, Community Service', 'Warning');

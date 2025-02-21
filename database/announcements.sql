@@ -10,3 +10,7 @@ CREATE TABLE announcements (
 
 INSERT INTO announcements (event_id, organizer_id, announcement_message, announcement_date_posted) VALUES
 ('E001', 1, 'Join us for the community BBQ!', CURRENT_TIMESTAMP);
+
+INSERT INTO announcements (event_id, user_id, announcement_message) VALUES
+('E1001', 2, 'Reminder: Study Session at Coleman Library on Dec 3rd!'),
+('E1002', 2, 'Get ready for Back to School at FAMU on Jan 4th!');
