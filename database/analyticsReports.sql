@@ -13,3 +13,5 @@ INSERT INTO analytics_reports (generated_by, report_date, report_type, report_da
 INSERT INTO analytics_reports (generated_by, report_type, report_data) VALUES
 (1, 'event', '{"event_id": "E1001", "attendees": 2}'),
 (2, 'user profile', '{"active_users": 10, "suspended_users": 1}');
+
+

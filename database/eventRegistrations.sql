@@ -1,4 +1,4 @@
-CREATE TABLE Event_registration (
+CREATE TABLE eventRegistrations (
     registration_id INT(10) PRIMARY KEY AUTO_INCREMENT COMMENT 'Unique identifier for each registration',
     event_id VARCHAR(20) NOT NULL COMMENT 'ID of the event being registered for',
     user_id INT(7) NOT NULL COMMENT 'ID of the participant being registered',

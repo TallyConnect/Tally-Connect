@@ -15,5 +15,5 @@ INSERT INTO disputes (raised_by, event_id, moderator_id, dispute_status, dispute
 (2, 'E001', 1, 'resolved', 'Issue resolved amicably.', CURRENT_TIMESTAMP);
 
 INSERT INTO disputes (user_id, event_id, dispute_status) VALUES
-(3, 'EVT1001', 'Pending'),
-(1, 'EVT1002', 'New Dispute-Unopened');
+(3, 'E1001', 'Pending'),
+(1, 'E1002', 'New Dispute-Unopened');

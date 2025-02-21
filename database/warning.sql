@@ -11,9 +11,6 @@ CREATE TABLE warnings (
 );
 
 INSERT INTO warnings (user_id, warning_reason, warning_status, warning_issued_by, warning_date_issued, warning_resolution) VALUES
-(1, 'Inappropriate content', 'yellow', 2, CURRENT_TIMESTAMP, FALSE);
+(1, 'Inappropriate content', 'yellow', 2, CURRENT_TIMESTAMP, FALSE),
+(1, 'Repeated policy violations.', 'red', 1, CURRENT_TIMESTAMP, FALSE);
 
-INSERT INTO warnings (user_id, warning_reason, warning_status, warning_issued_by, warning_date_issued, warning_resolution) VALUES
-(3, 'Repeated policy violations.', 'red', 1, CURRENT_TIMESTAMP, FALSE);
-
-#
