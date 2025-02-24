@@ -37,8 +37,6 @@ BEGIN
     INSERT INTO users (user_id, user_name, user_email, user_password, user_contact_details, user_preferences, user_status, user_created, user_last_updated)
     VALUES (new_user_id, user_name, user_email, user_password, user_contact_details, user_preferences, user_status, user_created, user_last_updated);
 
-    -- Automatically assign role in user_roles table
-    INSERT INTO user_roles (user_id, role_id) VALUES (new_user_id, role);
 END;
 //
 

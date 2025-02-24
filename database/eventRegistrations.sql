@@ -23,3 +23,6 @@ CREATE TABLE eventRegistrations (
  ('E1004', 'AshleyThomas', TRUE, CURRENT_TIMESTAMP),  
  ('E1004', 'DavidWilson', TRUE, CURRENT_TIMESTAMP),  
  ('E1004', 'MichaelBrown', TRUE, CURRENT_TIMESTAMP);
+
+-- TEST QUERY (new)
+-- INSERT INTO eventRegistrations (event_id, user_name, registration_status, registration_created) VALUES ('E1006', 'SophiaHarris', TRUE, CURRENT_TIMESTAMP);

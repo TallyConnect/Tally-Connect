@@ -8,6 +8,8 @@ CREATE TABLE users(
     user_status ENUM('Active', 'Warning', 'Suspended') NOT NULL,
     user_created TIMESTAMP,
     user_last_updated TIMESTAMP
+    -- role ENUM('Moderator', 'Organizer', 'Administrator', 'User') NOT NULL
+
 );
 
 -- Inserting a Moderator
@@ -35,3 +37,6 @@ CALL insert_user_with_role('SophiaHarris', 'sophia.h@example.com', 'securepass10
 
 -- Inserting an Administrator
 CALL insert_user_with_role('BobBrown', 'bob@gmail.com', 'adminpass', '555-4321', 'N/A', 'Active', 'Administrator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- EXAMPLE Query (new)
+-- CALL insert_user_with_role('TestUser2', 'test2@example.com', 'pwwhbviwjhjhvjkh', '444-5555', 'N/A', 'Active', 'Administrator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
