@@ -14,8 +14,8 @@ Event organizers can efficiently create, manage, and update their listings, stre
 # Entity Relationship Diagram
 This ERD diagram models the database structure for Tally Connect, outlining entities such as users, events, registrations, disputes, and analytics, and their relationships to support efficient event coordination and user management.
 
-<img width="857" alt="Screenshot 2025-02-05 at 9 08 24 AM" src="https://github.com/user-attachments/assets/b2dd26e2-9908-4753-beeb-920945d056a8" />
 
+![TC_updatedERD](https://github.com/user-attachments/assets/beb5b805-6dd0-4f5c-ba42-986146355587)
 
 
 # Data Dictionary
@@ -25,7 +25,6 @@ This data dictionary defines the structure, attributes, and constraints of the T
 
 | Field Name            | Data Type                          | Field Length | Constraints    | Description |
 |-----------------------|-----------------------------------|--------------|---------------|-------------|
-| user_id              | integer                           | 7            | Primary Key   | Auto-generated number to identify each user in the system |
 | user_name            | varchar                           | 20           | Not null      | Name displayed on profile |
 | user_email           | varchar                           | 50           | Not null      | Credentials used to sign up/log in |
 | user_password        | varchar                           | 60           | Not null      | Password used to sign up/log in |
@@ -35,19 +34,13 @@ This data dictionary defines the structure, attributes, and constraints of the T
 | user_created        | timestamp                         | 18           | -             | Stores the date and time when the user account was created |
 | user_last_updated   | timestamp                         | 18           | -             | Stores the date and time when the user profile was last updated |
 
-## User Roles Entity
-
-| Field Name | Data Type | Field Length | Constraints   | Description |
-|------------|----------|--------------|--------------|-------------|
-| user_id   | integer  | 7            | Foreign Key  | Auto-generated number to identify each user in the system |
-| role_name | varchar  | 20           | Not null     | Distinguish the role the user chooses |
 
 ## Events Entity
 
 | Field Name        | Data Type | Field Length | Constraints                          | Description |
 |-------------------|----------|--------------|--------------------------------------|-------------|
 | event_id         | varchar  | 20           | Primary Key, Not null               | Unique identifier for each event |
-| user_id          | Integer  | 7            | Foreign Key                          | The ID of the user who created the event |
+| user_name          | varchar  | 7            | Foreign Key                          | The ID of the user who created the event |
 | event_title      | varchar  | 100          | Not null                             | Title or name of the event |
 | event_description | Text    | -            | Not null                             | Detailed description of the event |
 | event_location   | varchar  | 50           | Not null                             | Address or venue of the event |
@@ -63,7 +56,7 @@ This data dictionary defines the structure, attributes, and constraints of the T
 |-----------------------|----------|--------------|--------------------------------------|-------------|
 | registration_id      | Integer  | 10           | Primary Key                          | Unique identifier for each registration |
 | event_id            | Varchar  | 20           | Foreign Key, Not null                | ID of the event being registered for |
-| user_id             | Integer  | 7            | Foreign Key, Not null                | ID of the participant being registered |
+| user_name             | varchar  | 20            | Foreign Key, Not null                | ID of the participant being registered |
 | registration_status | boolean  | -            | True or False                         | Stores whether a user is registered for an event or not |
 | registration_created | Timestamp | -           | DEFAULT CURRENT_TIMESTAMP            | Date and time of registration |
 
@@ -73,8 +66,9 @@ This data dictionary defines the structure, attributes, and constraints of the T
 |-----------------------|-----------|--------------|--------------------------------------|-------------|
 | dispute_status      | enum       | 20           | Not null                             | Informs moderator of "pending", "resolved", or "new dispute-unopened" |
 | dispute_id         | integer    | 7            | Primary Key                          | Auto-generated value for the purpose of locating and associating events and disputes |
-| user_id            | Integer    | 7            | Not null                             | Stores the ID of the user who raised a request, complaint, or issue |
+| raised_by            | varchar    | 7            | Not null                             | Stores the ID of the user who raised a request, complaint, or issue |
 | event_id           | Varchar    | 20           | Foreign Key                          | Unique identifier for an event |
+| moderator_id            | varchar    | 20            | Not null                             | Stores the ID of the moderator who handles a request, complaint, or issue |
 | dispute_resolution | Text       | -            | Default null                         | Explanation of the dispute, conclusion, and recommendations |
 | dispute_date_resolved | timestamp | 18           | DEFAULT CURRENT_TIMESTAMP            | Timestamp for when a dispute was resolved |
 
@@ -94,7 +88,7 @@ This data dictionary defines the structure, attributes, and constraints of the T
 |------------------------|----------|--------------|--------------------------------------|-------------|
 | announcement_id       | integer  | 7            | Primary Key                          | Unique identifier for announcement alerts |
 | event_id             | varchar  | 20           | Foreign Key, Not null                | Unique identifier for each event |
-| user_id              | integer  | 7            | Foreign Key, Not null                | Auto-generated number to identify each user |
+| user_name              | varchar  | 20            | Foreign Key, Not null                | Username to identify each organizer sending a message |
 | announcement_message | Text     | -            | -                                    | Message content of the announcement |
 | announcement_date_posted | Timestamp | -        | DEFAULT CURRENT_TIMESTAMP            | Date and time of posting |
 
@@ -104,7 +98,7 @@ This data dictionary defines the structure, attributes, and constraints of the T
 |------------------------|----------|--------------|--------------------------------------|-------------|
 | feedback_id          | integer  | 10           | Primary Key, Not null               | Unique identifier for each feedback report |
 | event_id            | varchar  | 20           | Foreign Key, Not null                | Unique identifier for each event |
-| user_id             | integer  | 7            | Foreign Key, Not null                | Unique identifier for each user reporting feedback |
+| user_name             | varchar  | 20            | Foreign Key, Not null                | Unique identifier for each user reporting feedback |
 | feedback_rating     | integer  | 5            | Not null                             | Rating given for event attended |
 | feedback_comments   | TEXT     | -            | Nullable                             | Comments given for an event attended |
 | feedback_date_submitted | Timestamp | -        | DEFAULT CURRENT_TIMESTAMP            | Date and time feedback was submitted |
@@ -114,10 +108,10 @@ This data dictionary defines the structure, attributes, and constraints of the T
 | Field Name             | Data Type | Field Length | Constraints                          | Description |
 |------------------------|----------|--------------|--------------------------------------|-------------|
 | warning_id          | integer  | 10           | Primary Key, Not null               | Unique identifier for each warning issued |
-| user_id            | integer  | 7            | Foreign Key, Not null                | Unique identifier for each user receiving a warning |
+| user_name            | varchar  | 20            | Foreign Key, Not null                | Unique identifier for each user receiving a warning |
 | warning_reason     | Text     | -            | Not null                             | Reason for the warning given |
 | warning_status     | Enum('yellow', 'red', 'black') | - | - | The status of the warning being given |
-| warning_issued_by  | Integer  | 7            | Foreign Key, Not null                | Unique identifier for each moderator issuing a warning |
+| warning_issued_by  | varchar  | 20            | Foreign Key, Not null                | Unique identifier for each moderator issuing a warning |
 | warning_date_issued | Timestamp | -           | DEFAULT CURRENT_TIMESTAMP            | Date and time the warning was issued |
 | warning_resolution | Boolean  | -            | Default false                        | Resolution for an event issued a warning |
 
