@@ -9,5 +9,5 @@ CREATE TABLE announcements (
 );
 
  INSERT INTO announcements (event_id, organizer_id, announcement_message, announcement_date_posted) VALUES
- ('E1003', 'DanielClark', 'Reminder: Join us for the Volunteer Event at Cascades Park on March 3rd!', CURRENT_TIMESTAMP),
- ('E1004', 'FAMU-FSU NSBE', 'Reminder: Don\'t miss the Tech & Leadership Conference at FSU Innovation Hub on May 10th!', CURRENT_TIMESTAMP);
+ ('E0003', 'DanielClark', 'Reminder: Join us for the Volunteer Event at Cascades Park on March 3rd!', CURRENT_TIMESTAMP),
+ ('E0004', 'FAMU-FSU NSBE', 'Reminder: Don\'t miss the Tech & Leadership Conference at FSU Innovation Hub on May 10th!', CURRENT_TIMESTAMP);

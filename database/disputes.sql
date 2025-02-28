@@ -12,9 +12,9 @@ CREATE TABLE disputes (
 );
 
  INSERT INTO disputes (raised_by, event_id, moderator_id, dispute_status, dispute_resolution, dispute_date_resolved) VALUES
- ('AliceJohnson', 'E001', 'SarahDavis', 'resolved', 'User was manually registered for the event.', CURRENT_TIMESTAMP),
- ('MichaelBrown', 'E1001', 'JessicaTaylor', 'pending', NULL, NULL),
- ('SophiaHarris', 'E1002', 'JessicaTaylor', 'new dispute-unopened', NULL, NULL),
- ('DavidWilson', 'E1003', 'JessicaTaylor', 'resolved', 'Confirmed registration manually.', CURRENT_TIMESTAMP),
- ('EmilyMartinez', 'E1004', 'JessicaTaylor', 'pending', NULL, NULL),
- ('RobertLopez', 'E1004', 'JessicaTaylor', 'new dispute-unopened', NULL, NULL);
+ ('AliceJohnson', 'E0001', 'SarahDavis', 'resolved', 'User was manually registered for the event.', CURRENT_TIMESTAMP),
+ ('MichaelBrown', 'E0001', 'JessicaTaylor', 'pending', NULL, NULL),
+ ('SophiaHarris', 'E0002', 'JessicaTaylor', 'new dispute-unopened', NULL, NULL),
+ ('DavidWilson', 'E0003', 'JessicaTaylor', 'resolved', 'Confirmed registration manually.', CURRENT_TIMESTAMP),
+ ('EmilyMartinez', 'E0004', 'JessicaTaylor', 'pending', NULL, NULL),
+ ('RobertLopez', 'E0004', 'JessicaTaylor', 'new dispute-unopened', NULL, NULL);

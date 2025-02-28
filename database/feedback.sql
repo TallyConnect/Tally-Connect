@@ -10,8 +10,8 @@ CREATE TABLE feedback (
 );
 
  INSERT INTO feedback (event_id, user_name, feedback_rating, feedback_comments, feedback_date_submitted) VALUES
- ('E001', 'AliceJohnson', 5, 'Great event! Loved the BBQ!', CURRENT_TIMESTAMP),  
- ('E001', 'MichaelBrown', 4, 'Had a great time at the Community BBQ!', CURRENT_TIMESTAMP),
+ ('E0001', 'AliceJohnson', 5, 'Great event! Loved the BBQ!', CURRENT_TIMESTAMP),  
+ ('E0001', 'MichaelBrown', 4, 'Had a great time at the Community BBQ!', CURRENT_TIMESTAMP),
 
- ('E1001', 'ChristopherAnderson', 5, 'Great study session, very helpful!', CURRENT_TIMESTAMP),  
- ('E1001', 'SophiaHarris', 5, 'Well-organized and productive.', CURRENT_TIMESTAMP);
+ ('E0001', 'ChristopherAnderson', 5, 'Great study session, very helpful!', CURRENT_TIMESTAMP),  
+ ('E0001', 'SophiaHarris', 5, 'Well-organized and productive.', CURRENT_TIMESTAMP);
