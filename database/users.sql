@@ -8,7 +8,6 @@ CREATE TABLE users(
     role ENUM('Moderator', 'Organizer', 'Administrator', 'User') NOT NULL,
     user_created TIMESTAMP,
     user_last_updated TIMESTAMP
-    -- role ENUM('Moderator', 'Organizer', 'Administrator', 'User') NOT NULL
 
 );
 
@@ -34,4 +33,4 @@ VALUES
     ('BobBrown', 'bob@gmail.com', 'adminpass', '555-4321', 'N/A', 'Active', 'Administrator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- EXAMPLE Query (new)
--- CALL insert_user_with_role('TestUser2', 'test2@example.com', 'pwwhbviwjhjhvjkh', '444-5555', 'N/A', 'Active', 'Administrator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO users ('TestUser2', 'test2@example.com', 'pwwhbviwjhjhvjkh', '444-5555', 'N/A', 'Active', 'Administrator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
