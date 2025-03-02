@@ -1,0 +1,20 @@
+# 🛑 Ignore Python Virtual Environment
+backend/venv/
+
+# 🛑 Ignore MySQL Database Credentials
+backend/.env
+
+# 🛑 Ignore Python Cache Files
+__pycache__/
+*.pyc
+*.pyo
+
+# 🛑 Ignore Node.js Dependencies (Frontend)
+frontend/node_modules/
+
+# 🛑 Ignore VS Code & macOS System Files
+.vscode/
+.DS_Store
+
+# 🛑 Ignore Flask Debug Logs
+backend/*.log
