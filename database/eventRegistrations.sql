@@ -9,20 +9,20 @@ CREATE TABLE eventRegistrations (
 );
 
  INSERT INTO eventRegistrations (event_id, user_name, registration_status, registration_created) VALUES
- ('E001', 'AliceJohnson', TRUE, CURRENT_TIMESTAMP),  
- ('E001', 'MichaelBrown', TRUE, CURRENT_TIMESTAMP),  
+ ('E0001', 'AliceJohnson', TRUE, CURRENT_TIMESTAMP),  
+ ('E0001', 'MichaelBrown', TRUE, CURRENT_TIMESTAMP),  
 
- ('E1001', 'ChristopherAnderson', TRUE, CURRENT_TIMESTAMP),  
- ('E1002', 'SophiaHarris', TRUE, CURRENT_TIMESTAMP),  
+ ('E0001', 'ChristopherAnderson', TRUE, CURRENT_TIMESTAMP),  
+ ('E0002', 'SophiaHarris', TRUE, CURRENT_TIMESTAMP),  
 
- ('E1002', 'DavidWilson', TRUE, CURRENT_TIMESTAMP),  
- ('E1002', 'RobertLopez', TRUE, CURRENT_TIMESTAMP),  
+ ('E0002', 'DavidWilson', TRUE, CURRENT_TIMESTAMP),  
+ ('E0002', 'RobertLopez', TRUE, CURRENT_TIMESTAMP),  
 
- ('E1003', 'SophiaHarris', TRUE, CURRENT_TIMESTAMP),  
+ ('E0003', 'SophiaHarris', TRUE, CURRENT_TIMESTAMP),  
 
- ('E1004', 'AshleyThomas', TRUE, CURRENT_TIMESTAMP),  
- ('E1004', 'DavidWilson', TRUE, CURRENT_TIMESTAMP),  
- ('E1004', 'MichaelBrown', TRUE, CURRENT_TIMESTAMP);
+ ('E0004', 'AshleyThomas', TRUE, CURRENT_TIMESTAMP),  
+ ('E0004', 'DavidWilson', TRUE, CURRENT_TIMESTAMP),  
+ ('E0004', 'MichaelBrown', TRUE, CURRENT_TIMESTAMP);
 
 -- TEST QUERY (new)
--- INSERT INTO eventRegistrations (event_id, user_name, registration_status, registration_created) VALUES ('E1006', 'SophiaHarris', TRUE, CURRENT_TIMESTAMP);
+-- INSERT INTO eventRegistrations (event_id, user_name, registration_status, registration_created) VALUES ('E1004', 'SophiaHarris', TRUE, CURRENT_TIMESTAMP);
