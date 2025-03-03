@@ -24,4 +24,4 @@ CREATE TABLE events (
 
 -- EXAMPLE QUERY (new)
 -- INSERT INTO events (event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status) VALUES
- ('E1007', 'DavidWilson', 'Test', 'Test.', 'Test', '2024-12-03', '10:00:00', 'Scheduled');
+ --('E1007', 'DavidWilson', 'Test', 'Test.', 'Test', '2024-12-03', '10:00:00', 'Scheduled');
