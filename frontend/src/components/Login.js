@@ -11,6 +11,8 @@ function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        console.log("Logging in with:", username, password,role);
+        
         try {
             const response = await axios.post("http://127.0.0.1:5000/api/login", {
                 username,

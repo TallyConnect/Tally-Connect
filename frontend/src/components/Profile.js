@@ -17,6 +17,10 @@ function Profile() {
             });
     }, []);
 
+    const openEventsWindow = () => {
+        window.open("/events", "_blank");
+    };
+
     if (error) return <p>{error}</p>;
     if (!user) return <p>Loading profile...</p>;
 
@@ -26,6 +30,11 @@ function Profile() {
             <p>Email: {user.user_email}</p>
             <p>Role: {user.role}</p>  
             <p>Status: {user.user_status}</p>
+
+            {/* Profile information and the button to open events in a new window */}
+            <div>
+                <button onClick={openEventsWindow}>Open Events in New Window</button>
+            </div>
         </div>
     );
 }

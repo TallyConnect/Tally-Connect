@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, session
 
-profile_bp = Blueprint('profile', __name__)
+profile_bp = Blueprint('profile', __name__,url_prefix='/api')
 
 @profile_bp.route('/profile', methods=['GET'])
 def user_profile():

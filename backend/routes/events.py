@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from config.db_config import get_db_connection
 
-events_bp = Blueprint('events', __name__)
+events_bp = Blueprint('events', __name__, url_prefix='/api')
 
 @events_bp.route('/events', methods=['GET'])
 def get_events():

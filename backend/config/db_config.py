@@ -16,3 +16,11 @@ def get_db_connection():
         password=os.getenv("DB_PASSWORD") if os.getenv("DB_PASSWORD") else "",
         database=os.getenv("DB_NAME")
     )
+
+# Test the connection
+if __name__ == "__main__":
+    try:
+        db = get_db_connection()
+        print("Connected to the database successfully")
+    except mysql.connector.Error as err:
+        print("Error connecting to the database: ", err)
