@@ -24,8 +24,14 @@ function Login() {
 
             if (response.status === 200) {
                 localStorage.setItem("user", JSON.stringify(response.data.user));  // ✅ Store user data
-                navigate("/profile");  // ✅ Redirect to profile page
+    
+                if (role === "Administrator") {
+                    navigate("/admin");
+                } else {
+                    navigate("/profile");
+                }
             }
+            
         } catch (err) {
             console.error("Login Error:", err.response ? err.response.data : err);  // ✅ Debugging
             setError("Invalid login credentials");
@@ -40,6 +46,8 @@ function Login() {
                     <option value="User">User</option>
                     <option value="Moderator">Moderator</option>
                     <option value="Organizer">Organizer</option>
+                    <option value="Administrator">Administrator</option>
+
                 </select>
                 <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />

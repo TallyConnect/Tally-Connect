@@ -4,6 +4,8 @@ from routes.auth import auth_bp
 from routes.profile import profile_bp
 from routes.event_signup import event_signup_bp
 from routes.events import events_bp
+from routes.admin import admin_bp
+from flask import Blueprint
 
 
 app = Flask(__name__)
@@ -20,6 +22,8 @@ app.register_blueprint(auth_bp, url_prefix='/api')  # ✅ Ensure it's `/api`, no
 app.register_blueprint(profile_bp, url_prefix='/api')
 app.register_blueprint(event_signup_bp, url_prefix='/api')
 app.register_blueprint(events_bp, url_prefix='/api')
+app.register_blueprint(admin_bp, url_prefix='/api')
+
 
 if __name__ == '__main__':
     print("Starting Flask App...")  # ✅ Debugging output
