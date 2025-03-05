@@ -24,6 +24,19 @@ function Events() {
         }
     };
 
+    const handleUnregister = async (eventId) => {
+        try {
+            const response = await axios.delete("http://127.0.0.1:5000/api/unregister_event",
+                { data: { event_id: eventId }, withCredentials: true }
+            );
+            setMessage(response.data.message);
+        }
+        catch (error) {
+            console.error("Error unregistering for event:", error);
+            setMessage(error.response?.data?.error || "An error occurred");
+        }
+    };
+
     return (
         <div>
             <h2>Events</h2>
@@ -32,6 +45,7 @@ function Events() {
                     <li key={event.event_id}>
                         {event.event_title} - {event.event_date}
                         <button onClick={() => handleSignup(event.event_id)}>Sign Up</button>
+                        <button onClick={() => handleUnregister(event.event_id)}>Unregister</button>
                     </li>
                 ))}
             </ul>
