@@ -38,18 +38,34 @@ function Events() {
     };
 
     return (
-        <div>
-            <h2>Events</h2>
-            <ul>
+        <div className="p-4">
+            <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
+            {message && <p className="text-green-600">{message}</p>}
+
+            <div className="grid grid-cols-3 gap-6">
                 {events.map(event => (
-                    <li key={event.event_id}>
-                        {event.event_title} - {event.event_date}
-                        <button onClick={() => handleSignup(event.event_id)}>Sign Up</button>
-                        <button onClick={() => handleUnregister(event.event_id)}>Unregister</button>
-                    </li>
+                    <div key={event.event_id} className="bg-white p-4 rounded-lg shadow-md">
+                        {event.flyer_url && (
+                            <img src={event.flyer_url} alt={event.event_title} className="h-40 w-full object-cover rounded-lg" />
+                        )}
+                        <h3 className="text-lg font-semibold mt-2">{event.event_title}</h3>
+                        <p className="text-gray-600">{event.event_date}</p>
+
+                        <div className="mt-2 flex gap-2">
+                            <button
+                                className="bg-blue-500 text-white px-3 py-1 rounded-md"
+                                onClick={() => handleSignup(event.event_id)}>
+                                Sign Up
+                            </button>
+                            <button
+                                className="bg-red-500 text-white px-3 py-1 rounded-md"
+                                onClick={() => handleUnregister(event.event_id)}>
+                                Unregister
+                            </button>
+                        </div>
+                    </div>
                 ))}
-            </ul>
-            {message && <p>{message}</p>}
+            </div>
         </div>
     );
 }

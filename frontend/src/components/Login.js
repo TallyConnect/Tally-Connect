@@ -28,7 +28,7 @@ function Login() {
                 if (role === "Administrator") {
                     navigate("/admin");
                 } else {
-                    navigate("/profile");
+                    navigate("/home");
                 }
             }
             
@@ -47,7 +47,6 @@ function Login() {
                     <option value="Moderator">Moderator</option>
                     <option value="Organizer">Organizer</option>
                     <option value="Administrator">Administrator</option>
-
                 </select>
                 <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />

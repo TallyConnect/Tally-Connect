@@ -13,6 +13,8 @@ CREATE TABLE events (
     FOREIGN KEY (user_name) REFERENCES users(user_name) ON DELETE CASCADE
 );
 
+ALTER TABLE events ADD COLUMN flyer_url VARCHAR(500);
+
 CALL insert_event('JaneSmith', 'Community BBQ', 'A fun BBQ event for the neighborhood', 'Central Park', '2025-03-01', '12:00:00', 'Scheduled');
 
 CALL insert_event('SophiaMartinez', 'Study Session at Coleman Library', 'A focused study session at Coleman Library for students.', 'Coleman Library, FAMU', '2024-12-03', '10:00:00', 'Scheduled');
