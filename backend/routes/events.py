@@ -7,7 +7,7 @@ events_bp = Blueprint('events', __name__, url_prefix='/api')
 def get_events():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT event_id, event_title, event_date, event_flyer_url FROM events")  # ✅ Ensure correct query
+    cursor.execute("SELECT event_id, event_title, event_date FROM events")  # ✅ Ensure correct query
     events = cursor.fetchall()
     db.close()
     return jsonify(events)
