@@ -1,12 +1,12 @@
 from flask import Flask
+from flask import Blueprint
 from flask_cors import CORS
 from routes.auth import auth_bp
 from routes.profile import profile_bp
 from routes.event_signup import event_signup_bp
 from routes.events import events_bp
 from routes.admin import admin_bp
-from flask import Blueprint
-
+from routes.logout import logout_bp
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # ✅ Required for session storage
@@ -23,6 +23,7 @@ app.register_blueprint(profile_bp, url_prefix='/api')
 app.register_blueprint(event_signup_bp, url_prefix='/api')
 app.register_blueprint(events_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/api')
+app.register_blueprint(logout_bp, url_prefix='/api')
 
 
 if __name__ == '__main__':

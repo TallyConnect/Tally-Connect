@@ -11,7 +11,7 @@ function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        console.log("Logging in with:", username, password,role);
+        console.log("Logging in with:", username, password, role);
         
         try {
             const response = await axios.post("http://127.0.0.1:5000/api/login", {
@@ -24,14 +24,22 @@ function Login() {
 
             if (response.status === 200) {
                 localStorage.setItem("user", JSON.stringify(response.data.user));  // ✅ Store user data
-    
-                if (role === "Administrator") {
-                    navigate("/admin");
-                } else {
-                    navigate("/home");
+
+                switch (role) {
+                    case "Administrator":
+                        navigate("/admin");
+                        break;
+                    case "Moderator":
+                        navigate("/home");
+                        break;
+                    case "Organizer":
+                        navigate("/home");
+                        break;
+                    default:
+                        navigate("/home");
+                        break;
                 }
-            }
-            
+            }  
         } catch (err) {
             console.error("Login Error:", err.response ? err.response.data : err);  // ✅ Debugging
             setError("Invalid login credentials");
@@ -54,7 +62,7 @@ function Login() {
             </form>
             {error && <p>{error}</p>}
 
-            {/*Added Sign Up button*/}
+            {/* Added Sign Up button */}
             <p>Don't have an account? <button onClick={() => navigate("/signup")}>Sign Up</button></p>
         </div>
     );

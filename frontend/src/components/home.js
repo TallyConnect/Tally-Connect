@@ -6,16 +6,58 @@ function Home() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
     const [events, setEvents] = useState([]);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
+            .then((response) => setUser(response.data))
+            .catch((error) => console.error("Error fetching user:", error));
+    }, []);
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/events")
-        .then((response) => setEvents(response.data))
-        .catch((error) => console.error("Error fetching events:", error));
+            .then((response) => setEvents(response.data))
+            .catch((error) => console.error("Error fetching events:", error));
     }, []);
 
     const filteredEvents = events.filter(event => 
         event.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    if (!user) return <p>Loading profile ...</p>;
+
+    const menuOptions = {
+        user: [
+            { name: "Home", path: "/home", icon: "fa-home" },
+            { name: "Profile", path: "/profile", icon: "fa-user" },
+            { name: "Calendar", path: "/calendar", icon: "fa-calendar" },
+            { name: "Feedback/Reviews", path: "/feedback", icon: "fa-comments" },
+            { name: "Explore", path: "/explore", icon: "fa-search" }
+        ],
+        admin: [
+            { name: "Home", path: "/home", icon: "fa-home" },
+            { name: "Profile", path: "/profile", icon: "fa-user" },
+            { name: "Users", path: "/users", icon: "fa-users" },
+            { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
+            { name: "Analytics", path: "/analysis", icon: "fa-chart-bar" },
+            { name: "Disputes", path: "/disputes", icon: "fa-exclamation-circle" }
+        ],
+        organizer: [
+            { name: "Home", path: "/home", icon: "fa-home" },
+            { name: "Profile", path: "/profile", icon: "fa-user" },
+            { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
+            { name: "Calendar", path: "/calendar", icon: "fa-calendar" },
+            { name: "Feedback/Reviews", path: "/feedback", icon: "fa-comments" },
+            { name: "Analytics", path: "/analysis", icon: "fa-chart-bar" }
+        ],
+        moderator: [
+            { name: "Home", path: "/home", icon: "fa-home" },
+            { name: "Profile", path: "/profile", icon: "fa-user" },
+            { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
+            { name: "Disputes", path: "/disputes", icon: "fa-exclamation-circle" },
+            { name: "Engagement", path: "/engagement", icon: "fa-handshake" }
+        ]
+    };
 
     return (
         <div className="flex h-screen">
@@ -77,10 +119,11 @@ function Home() {
             {/* Left Sidebar */}
             <div className="sidebar">
                 <h3 className="text-xl font-bold mb-4 text-white pl-6">Menu</h3>
-                <button onClick={() => navigate("/home")}>Home</button>
-                <button onClick={() => navigate("/profile")}>Profile</button>
-                <button onClick={() => navigate("/calendar")}>Calendar</button>
-                <button onClick={() => navigate("/explore")}>Explore</button>
+                {menuOptions[user.role.toLowerCase()]?.map((option) => (
+                    <button key={option.path} onClick={() => navigate(option.path)}>
+                        <i className={`fa fa-fw ${option.icon}`}></i>{option.name}
+                    </button>
+                ))}
             </div>
 
             {/* Main Content */}

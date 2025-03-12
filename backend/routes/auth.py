@@ -12,14 +12,9 @@ def login():
     password = data.get("password")
     role = data.get("role")
 
-    print(f"Login attempt - Username: {username}, Role: {role}")  # ✅ Debugging
-
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
-
-    # ✅ Log SQL Query before execution
-    print(f"Executing Query: SELECT * FROM users WHERE user_name='{username}' AND user_password='{password}' AND role='{role}'")
-
+    
     cursor.execute("SELECT * FROM users WHERE user_name = %s AND user_password = %s AND role = %s", 
                    (username, password, role))
     user = cursor.fetchone()
@@ -74,4 +69,11 @@ def signup():
 
     print(f"User {username} created successfully!")  # ✅ Debugging output
     return jsonify({"message": "User created successfully"}), 201
-    
+
+
+@auth_bp.route('/logout', methods=['POST'])
+@cross_origin(origin='http://localhost:3000', supports_credentials=True)
+def logout():
+    session.clear()
+    print("Logged out successfully!")
+    return jsonify({"message": "Logged out successfully"}), 200
