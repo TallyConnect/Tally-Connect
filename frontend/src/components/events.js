@@ -3,69 +3,194 @@ import axios from "axios";
 
 function Events() {
     const [events, setEvents] = useState([]);
+    const [user, setUser] = useState(null);
     const [message, setMessage] = useState("");
+    const [showPopup, setShowPopup] = useState(false);
+    const [eventData, setEventData] = useState({
+        event_title: "",
+        event_date: "",
+        event_location: "",
+        event_time: "",
+        event_description: "",
+        selectedFile: null
+    });
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:5000/api/events")
-            .then(response => setEvents(response.data))
-            .catch(error => console.error("Error fetching events:", error));
+        axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
+            .then(response => setUser(response.data))
+            .catch(error => console.error("Error fetching user profile:", error));
     }, []);
 
-    const handleSignup = async (eventId) => {
+    useEffect(() => {
+        if (user) {
+            axios.get(`http://127.0.0.1:5000/api/events?role=${user.role}&username=${user.user_name}`)
+            .then(response => {
+                console.log("Fetched events:", response.data);
+                setEvents(response.data);
+            })
+            .catch(error => console.error("Error fetching events:", error));
+        }
+    }, [user]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setEventData(prevData => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
+
+    const handleFileChange = (e) => setEventData({ ...eventData, selectedFile: e.target.files[0] });
+
+    const handleUpload = async () => {
+        console.log(eventData); 
+
+        if (!eventData.selectedFile || !eventData.event_title || !eventData.event_date || !eventData.event_location) {
+            alert("Please fill in all fields and upload a flyer.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", eventData.selectedFile);
+        formData.append("user_name", user.user_name);  // Organizer's username
+        formData.append("event_title", eventData.event_title);  // Add relevant details
+        formData.append("event_description", eventData.event_description);
+        formData.append("event_location", eventData.event_location);
+        formData.append("event_date", eventData.event_date);
+        formData.append("event_time", eventData.event_time);
+
         try {
-            const response = await axios.post("http://127.0.0.1:5000/api/signup_event",
-                { event_id: eventId },
-                { withCredentials: true }
-            );
+            const response = await axios.post("http://127.0.0.1:5000/api/upload_flyer", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
             setMessage(response.data.message);
+            setEvents((prevEvents) => [...prevEvents, {
+                event_id: response.data.event_id,
+                event_title: eventData.event_title,
+                flyer_url: response.data.flyer_url,
+            }]);
+            setShowPopup(false);
         } catch (error) {
-            console.error("Error signing up for event:", error);
-            setMessage(error.response?.data?.error || "An error occurred");
+            console.error("Error uploading flyer:", error);
+            setMessage("Error uploading flyer. Please try again.");
         }
     };
 
-    const handleUnregister = async (eventId) => {
-        try {
-            const response = await axios.delete("http://127.0.0.1:5000/api/unregister_event",
-                { data: { event_id: eventId }, withCredentials: true }
-            );
-            setMessage(response.data.message);
-        }
-        catch (error) {
-            console.error("Error unregistering for event:", error);
-            setMessage(error.response?.data?.error || "An error occurred");
-        }
-    };
+    if (!user) return <p>Loading profile...</p>;
 
     return (
         <div className="p-4">
+            <style>
+                {`
+                .grid-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                    gap: 20px;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                }
+                .grid-item {
+                    background-color: #fff;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                    text-align: center;
+                    transition: transform 0.2s ease-in-out;
+                }
+                .grid-item:hover {
+                    transform: scale(1.05);
+                }
+                .flyer-image {
+                    width: 100%;
+                    height: 300px;
+                    object-fit: cover;
+                    border-bottom: 2px solid #e0e0e0;
+                }
+                .event-title {
+                    font-weight: bold;
+                    padding: 10px 0;
+                }
+                .popup {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: white;
+                    padding: 20px;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+                `}
+            </style>
+
             <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
             {message && <p className="text-green-600">{message}</p>}
 
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid-container">
                 {events.map(event => (
-                    <div key={event.event_id} className="bg-white p-4 rounded-lg shadow-md">
-                        {event.flyer_url && (
-                            <img src={event.flyer_url} alt={event.event_title} className="h-40 w-full object-cover rounded-lg" />
-                        )}
-                        <h3 className="text-lg font-semibold mt-2">{event.event_title}</h3>
-                        <p className="text-gray-600">{event.event_date}</p>
-
-                        <div className="mt-2 flex gap-2">
-                            <button
-                                className="bg-blue-500 text-white px-3 py-1 rounded-md"
-                                onClick={() => handleSignup(event.event_id)}>
-                                Sign Up
-                            </button>
-                            <button
-                                className="bg-red-500 text-white px-3 py-1 rounded-md"
-                                onClick={() => handleUnregister(event.event_id)}>
-                                Unregister
-                            </button>
-                        </div>
+                    <div key={event.event_id}>
+                        <img 
+                            src={`http://127.0.0.1:5000${event.flyer_url}`} 
+                            alt={event.event_title} 
+                            className="flyer-image" 
+                        />
+                        <h3 className="event-title">{event.event_title}</h3>
                     </div>
                 ))}
             </div>
+
+            {user.role.toLowerCase() === 'organizer' && (
+                <div className="mt-4">
+                    <button
+                        className="bg-green-500 text-white px-4 py-2 mt-2 rounded-md"
+                        onClick={() => setShowPopup(true)}
+                    >
+                        Upload Event
+                    </button>
+                </div>
+            )}
+
+            {showPopup && (
+                <div className="popup">
+                    <h3>Enter Event Details</h3>
+                    <input
+                        type="text"
+                        name="event_title"
+                        placeholder="Event Title"
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="date"
+                        name="event_date"
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="text"
+                        name="event_location"
+                        placeholder="Location"
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="time"
+                        name="event_time" 
+                        onChange={handleChange}
+                    />
+                    <textarea
+                        name="event_description"  
+                        placeholder="Event Description"
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="file"
+                        onChange={handleFileChange}
+                        accept=".png,.jpg,.jpeg,.gif"
+                    />
+                    <button onClick={handleUpload} className="bg-blue-500 text-white px-4 py-2 mt-2 rounded-md">Submit</button>
+                    <button onClick={() => setShowPopup(false)} className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">Cancel</button>
+                </div>
+            )}
         </div>
     );
 }

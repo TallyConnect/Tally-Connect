@@ -19,20 +19,16 @@ function Profile() {
             });
     }, []);
 
-    const openEventsWindow = () => {
-        window.open("/events", "_blank");
-    };
-
     const handleSignOut = async () => {
         try {
             await axios.post("http://127.0.0.1:5000/api/logout", {}, { withCredentials: true });
 
             sessionStorage.removeItem("user");
             localStorage.removeItem("user");
-
             document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
             console.log("Logout successful");
+
             navigate("/");
         } catch (error) {
             console.error("Logout error:", error);
@@ -49,11 +45,6 @@ function Profile() {
             <p>Email: {user.user_email}</p>
             <p>Role: {user.role}</p>  
             <p>Status: {user.user_status}</p>
-
-            {/* Profile information and the button to open events in a new window */}
-            <div>
-                <button onClick={openEventsWindow}>Open Events in New Window</button>
-            </div>
 
             {/* Sign out button */}
             <div style={{ marginTop: "20px" }}>

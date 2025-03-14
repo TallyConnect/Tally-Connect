@@ -28,4 +28,4 @@ app.register_blueprint(logout_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     print("Starting Flask App...")  # ✅ Debugging output
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

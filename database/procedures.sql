@@ -8,6 +8,7 @@ CREATE PROCEDURE insert_event(
     IN event_date DATE,
     IN event_time TIME,
     IN event_status ENUM('Scheduled', 'Canceled', 'Completed')
+    IN flyer_url VARCHAR(500)
 )
 BEGIN
     DECLARE new_event_id VARCHAR(10);
@@ -22,8 +23,8 @@ BEGIN
     SET new_event_id = CONCAT('E', LPAD(last_id, 4, '0'));
 
     -- Insert the new event
-    INSERT INTO events (event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status, event_created, event_last_updated)
-    VALUES (new_event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    INSERT INTO events (event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status, flyer_url, event_created, event_last_updated)
+    VALUES (new_event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status, flyer_url, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
     
     -- Return the new event_id (optional)
     SELECT new_event_id AS 'Generated Event ID';

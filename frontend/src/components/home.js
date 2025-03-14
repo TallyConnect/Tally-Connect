@@ -16,12 +16,15 @@ function Home() {
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/events")
-            .then((response) => setEvents(response.data))
-            .catch((error) => console.error("Error fetching events:", error));
+            .then(response => {
+                console.log("Fetched Events Data:", response.data);
+                setEvents(response.data);
+            })
+            .catch(error => console.error("Error fetching events:", error));
     }, []);
 
     const filteredEvents = events.filter(event => 
-        event.title.toLowerCase().includes(searchQuery.toLowerCase())
+        event?.event_title?.toLowerCase().includes((searchQuery || "").toLowerCase())
     );
 
     if (!user) return <p>Loading profile ...</p>;
