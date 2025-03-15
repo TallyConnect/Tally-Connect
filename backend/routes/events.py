@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from config.db_config import get_db_connection
 import os
 import uuid
+from datetime import datetime, timedelta
 
 events_bp = Blueprint('events', __name__, url_prefix='/api')
 
@@ -14,6 +15,28 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def serialize_event(event):
+    if isinstance(event.get('event_date'), datetime):
+        print(f"Serializing event_date: {event['event_date']}")
+        event['event_date'] = event['event_date'].isoformat()
+
+    if isinstance(event.get('event_time'), timedelta):
+        print(f"Serializing event_time (timedelta): {event['event_time']}")
+        event['event_time'] = str(event['event_time'])
+
+    if isinstance(event.get('event_created'), datetime):
+        print(f"Serializing event_created: {event['event_created']}")
+        event['event_created'] = event['event_created'].isoformat()
+
+    if isinstance(event.get('event_last_updated'), datetime):
+        print(f"Serializing event_last_updated: {event['event_last_updated']}")
+        event['event_last_updated'] = event['event_last_updated'].isoformat()
+
+    # Add debugging statement to print the event data
+    print("Serialized Event Data:", event)
+
+    return event
 
 @events_bp.route('/upload_flyer', methods=['POST'])
 def upload_flyer():
@@ -91,5 +114,46 @@ def get_events():
 
     events = cursor.fetchall()
     db.close()
-    return jsonify(events)
+    
+    serialize_events = [serialize_event(event) for event in events]
+
+    return jsonify(serialize_events)
+
+@events_bp.route('/events/<event_id>', methods=['GET'])
+def get_event_details(event_id):
+    # Fetch specific event details by event_id
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM events WHERE event_id = %s", (event_id,))
+    event = cursor.fetchone()
+
+    db.close()
+
+    if event:
+        print("Event Data Before Serialization", event)
+        serialized_event = serialize_event(event)
+        print("Serialized Event Data:", serialized_event)
+        return jsonify(serialized_event)
+    else:
+        return jsonify({"error": "Event not found"}), 404
+
+@events_bp.route('/events/<event_id>', methods=['DELETE'])
+def delete_event(event_id):
+    # Delete an event by event_id
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    # First, check if the event exists
+    cursor.execute("SELECT * FROM events WHERE event_id = %s", (event_id,))
+    event = cursor.fetchone()
+
+    if event:
+        cursor.execute("DELETE FROM events WHERE event_id = %s", (event_id,))
+        db.commit()
+        db.close()
+        return jsonify({"message": "Event deleted successfully"}), 200
+    else:
+        db.close()
+        return jsonify({"error": "Event not found"}), 404
 

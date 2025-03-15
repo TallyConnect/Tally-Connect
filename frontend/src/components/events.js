@@ -14,6 +14,7 @@ function Events() {
         event_description: "",
         selectedFile: null
     });
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
@@ -76,6 +77,30 @@ function Events() {
         }
     };
 
+    const handleEventClick = (eventId) => {
+        axios.get(`http://127.0.0.1:5000/api/events/${eventId}`)
+        .then(response => {
+            setSelectedEvent(response.data);
+            setShowPopup(true);
+        })
+        .catch(error => {
+            console.error("Error fetching event details:", error);
+            setMessage("Error fetching event details. Please try again.");
+        });
+    };
+
+    const handleDeleteEvent = async (eventId) => {
+        try {
+            const response = await axios.delete(`http://127.0.0.1:5000/api/events/${eventId}`);
+            setMessage(response.data.message);
+            setEvents(events.filter(event => event.event_id !== eventId));  // Remove event from the list
+            setShowPopup(false);  // Close the popup
+        } catch (error) {
+            console.error("Error deleting event:", error);
+            setMessage("Error deleting event. Please try again.");
+        }
+    };
+
     if (!user) return <p>Loading profile...</p>;
 
     return (
@@ -121,6 +146,10 @@ function Events() {
                     border: 2px solid #e0e0e0;
                     border-radius: 12px;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    z-index: 1000;
+                }
+                .popup img {
+                    margin-top:10px;
                 }
                 `}
             </style>
@@ -130,7 +159,7 @@ function Events() {
 
             <div className="grid-container">
                 {events.map(event => (
-                    <div key={event.event_id}>
+                    <div key={event.event_id} className="grid-item" onClick={() => handleEventClick(event.event_id)}>
                         <img 
                             src={`http://127.0.0.1:5000${event.flyer_url}`} 
                             alt={event.event_title} 
@@ -189,6 +218,23 @@ function Events() {
                     />
                     <button onClick={handleUpload} className="bg-blue-500 text-white px-4 py-2 mt-2 rounded-md">Submit</button>
                     <button onClick={() => setShowPopup(false)} className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">Cancel</button>
+                </div>
+            )}
+
+            {showPopup && selectedEvent && (
+                <div className="popup">
+                    <h3>{selectedEvent.event_title}</h3>
+                    <img 
+                        src={`http://127.0.0.1:5000${selectedEvent.flyer_url}`} 
+                        alt={selectedEvent.event_title} 
+                        className="flyer-image" 
+                    />
+                    <p><strong>Description:</strong> {selectedEvent.event_description}</p>
+                    <p><strong>Location:</strong> {selectedEvent.event_location}</p>
+                    <p><strong>Date:</strong> {selectedEvent.event_date}</p>
+                    <p><strong>Time:</strong> {selectedEvent.event_time}</p>
+                    <button onClick={() => handleDeleteEvent(selectedEvent.event_id)} className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">Delete Event</button>
+                    <button onClick={() => setShowPopup(false)} className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">Close</button>
                 </div>
             )}
         </div>

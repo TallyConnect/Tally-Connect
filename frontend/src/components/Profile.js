@@ -29,7 +29,7 @@ function Profile() {
 
             console.log("Logout successful");
 
-            navigate("/");
+            navigate("/login");
         } catch (error) {
             console.error("Logout error:", error);
             alert("Failed to logout. Please try again.");
