@@ -5,7 +5,8 @@ function Events() {
     const [events, setEvents] = useState([]);
     const [user, setUser] = useState(null);
     const [message, setMessage] = useState("");
-    const [showPopup, setShowPopup] = useState(false);
+    const [showUploadPopup, setShowUploadPopup] = useState(false);
+    const [showEventDetailsPopup, setShowEventDetailsPopup] = useState(false);
     const [eventData, setEventData] = useState({
         event_title: "",
         event_date: "",
@@ -70,7 +71,7 @@ function Events() {
                 event_title: eventData.event_title,
                 flyer_url: response.data.flyer_url,
             }]);
-            setShowPopup(false);
+            setShowUploadPopup(true);
         } catch (error) {
             console.error("Error uploading flyer:", error);
             setMessage("Error uploading flyer. Please try again.");
@@ -81,7 +82,7 @@ function Events() {
         axios.get(`http://127.0.0.1:5000/api/events/${eventId}`)
         .then(response => {
             setSelectedEvent(response.data);
-            setShowPopup(true);
+            setShowEventDetailsPopup(true);
         })
         .catch(error => {
             console.error("Error fetching event details:", error);
@@ -94,7 +95,7 @@ function Events() {
             const response = await axios.delete(`http://127.0.0.1:5000/api/events/${eventId}`);
             setMessage(response.data.message);
             setEvents(events.filter(event => event.event_id !== eventId));  // Remove event from the list
-            setShowPopup(false);  // Close the popup
+            setShowEventDetailsPopup(false);  // Close the popup
         } catch (error) {
             console.error("Error deleting event:", error);
             setMessage("Error deleting event. Please try again.");
@@ -174,14 +175,14 @@ function Events() {
                 <div className="mt-4">
                     <button
                         className="bg-green-500 text-white px-4 py-2 mt-2 rounded-md"
-                        onClick={() => setShowPopup(true)}
+                        onClick={() => setShowUploadPopup(true)}
                     >
                         Upload Event
                     </button>
                 </div>
             )}
 
-            {showPopup && (
+            {showUploadPopup && (
                 <div className="popup">
                     <h3>Enter Event Details</h3>
                     <input
@@ -217,11 +218,11 @@ function Events() {
                         accept=".png,.jpg,.jpeg,.gif"
                     />
                     <button onClick={handleUpload} className="bg-blue-500 text-white px-4 py-2 mt-2 rounded-md">Submit</button>
-                    <button onClick={() => setShowPopup(false)} className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">Cancel</button>
+                    <button onClick={() => setShowUploadPopup(false)} className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">Cancel</button>
                 </div>
             )}
 
-            {showPopup && selectedEvent && (
+            {showEventDetailsPopup && selectedEvent && (
                 <div className="popup">
                     <h3>{selectedEvent.event_title}</h3>
                     <img 
@@ -234,7 +235,7 @@ function Events() {
                     <p><strong>Date:</strong> {selectedEvent.event_date}</p>
                     <p><strong>Time:</strong> {selectedEvent.event_time}</p>
                     <button onClick={() => handleDeleteEvent(selectedEvent.event_id)} className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">Delete Event</button>
-                    <button onClick={() => setShowPopup(false)} className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">Close</button>
+                    <button onClick={() => setShowEventDetailsPopup(false)} className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">Close</button>
                 </div>
             )}
         </div>
