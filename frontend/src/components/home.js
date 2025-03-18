@@ -7,6 +7,8 @@ function Home() {
     const [searchQuery, setSearchQuery] = useState("");
     const [events, setEvents] = useState([]);
     const [user, setUser] = useState(null);
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
@@ -27,130 +29,140 @@ function Home() {
         event?.event_title?.toLowerCase().includes((searchQuery || "").toLowerCase())
     );
 
-    if (!user) return <p>Loading profile ...</p>;
+    if (!user) return <p>Loading profile...</p>;
 
-    const menuOptions = {
-        user: [
-            { name: "Home", path: "/home", icon: "fa-home" },
-            { name: "Profile", path: "/profile", icon: "fa-user" },
-            { name: "Calendar", path: "/calendar", icon: "fa-calendar" },
-            { name: "Feedback/Reviews", path: "/feedback", icon: "fa-comments" },
-            { name: "Explore", path: "/explore", icon: "fa-search" }
-        ],
-        admin: [
-            { name: "Home", path: "/home", icon: "fa-home" },
-            { name: "Profile", path: "/profile", icon: "fa-user" },
-            { name: "Users", path: "/users", icon: "fa-users" },
-            { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
-            { name: "Analytics", path: "/analysis", icon: "fa-chart-bar" },
-            { name: "Disputes", path: "/disputes", icon: "fa-exclamation-circle" }
-        ],
-        organizer: [
-            { name: "Home", path: "/home", icon: "fa-home" },
-            { name: "Profile", path: "/profile", icon: "fa-user" },
-            { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
-            { name: "Calendar", path: "/calendar", icon: "fa-calendar" },
-            { name: "Feedback/Reviews", path: "/feedback", icon: "fa-comments" },
-            { name: "Analytics", path: "/analysis", icon: "fa-chart-bar" }
-        ],
-        moderator: [
-            { name: "Home", path: "/home", icon: "fa-home" },
-            { name: "Profile", path: "/profile", icon: "fa-user" },
-            { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
-            { name: "Disputes", path: "/disputes", icon: "fa-exclamation-circle" },
-            { name: "Engagement", path: "/engagement", icon: "fa-handshake" }
-        ]
+    const handleFlyerClick = (event) => {
+        setSelectedEvent(event);
+        setShowPopup(true);
+    };
+
+    const handleClosePopup = () => {
+        setShowPopup(false);
+        setSelectedEvent(null);
+    };
+
+    const handleRegister = () => {
+        axios.post("http://127.0.0.1:5000/api/signup_event", { event_id: selectedEvent.event_id }, { withCredentials: true })
+            .then(response => {
+                alert(response.data.message);
+                handleClosePopup();
+            })
+            .catch(error => {
+                console.error("Registration error:", error);
+                alert("Error registering for the event.");
+            });
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="main w-full p-4">
             <style>
                 {`
-                    :root {
-                        --card_width: 250px;
-                        --row_increment: 10px;
-                        --card_border_radius: 16px;
-                        --card_small: 26;
-                        --card_med: 33;
-                        --card_large: 45;
-                    }
+                .grid-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                    gap: 20px;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                }
+                .grid-item {
+                    background-color: #fff;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                    text-align: center;
+                    transition: transform 0.2s ease-in-out;
+                }
+                .grid-item:hover {
+                    transform: scale(1.05);
+                }
+                .flyer-image {
+                    width: 100%;
+                    height: 300px;
+                    object-fit: cover;
+                    border-bottom: 2px solid #e0e0e0;
+                }
+                .event-title {
+                    font-weight: bold;
+                    padding: 10px 0;
+                }
+                .popup-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                }
 
-                    /* Pin container setup */
-                    .pin-container {
-                        margin: 0;
-                        padding: 0;
-                        width: 80vw;
-                        position: absolute;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        display: grid;
-                        grid-template-columns: repeat(auto-fill, var(--card_width));
-                        grid-auto-rows: var(--row_increment);
-                        justify-content: center;
-                        background-color: black;
-                    }
-                
-                    /* Individual pin setup */
-                    .card {
-                        padding: 0;
-                        margin: 15px 10px;
-                        border-radius: var(--card_border_radius);
-                        background-color: red;
-                        overflow: hidden; /* To ensure the image doesn't overflow the card */
-                    }   
-                
-                    /* Medium card size */
-                    .card_medium {
-                        grid-row: span var(--card_med);
-                        grid-column: span var(--card_med);
-                    }
+                .popup {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    width: 400px;
+                    text-align: center;
+                }
 
-                    /* Ensure the images fit within card and maintain aspect ratio */
-                    .card img {
-                        width: 100%;
-                        height: auto;
-                        border-radius: inherit;
-                    }
-                    
-                    /* Main content padding adjustment for sidebar */
-                    .main {
-                        margin-left: 160px;
-                        padding: 0px 10px;}
+                .popup button {
+                    margin-top: 10px;
+                    padding: 10px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                }
+
+                .popup button:hover {
+                    background-color: #45a049;
+                }
                 `}
             </style>
 
-            {/* Left Sidebar */}
-            <div className="sidebar">
-                <h3 className="text-xl font-bold mb-4 text-white pl-6">Menu</h3>
-                {menuOptions[user.role.toLowerCase()]?.map((option) => (
-                    <button key={option.path} onClick={() => navigate(option.path)}>
-                        <i className={`fa fa-fw ${option.icon}`}></i>{option.name}
-                    </button>
+            {/* Search Bar */}
+            <div className="mb-4">
+                <input
+                    type="text"
+                    placeholder="Search Events"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+            </div>
+
+            {/* Event Flyers Grid */}
+            <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
+            <div className="grid-container">
+                {filteredEvents.map((event) => (
+                    <div key={event.event_id} className="grid-item">
+                        <img 
+                            src={`http://127.0.0.1:5000${event.flyer_url}`} 
+                            alt={event.event_title} 
+                            className="flyer-image" 
+                            onClick={() => handleFlyerClick(event)}
+                        />
+                        <h3 className="event-title">{event.event_title}</h3>
+                    </div>
                 ))}
             </div>
 
-            {/* Main Content */}
-            <div className="main w-full p-4">
-                {/* Search Bar */}
-                <div className="mb-4">
-                    <input
-                        type="text"
-                        placeholder="Search Events"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-lg"
-                    />
+            {/* Popup Modal for Registration */}
+            {showPopup && (
+                <div className="popup-overlay">
+                    <div className="popup">
+                        <h2>{selectedEvent.event_title}</h2>
+                        <p>{selectedEvent.event_description}</p>
+                        <p>Location: {selectedEvent.event_location}</p>
+                        <p>Date: {selectedEvent.event_date}</p>
+                        <p>Time: {selectedEvent.event_time}</p>
+                        <button onClick={handleRegister}>Register</button>
+                        <button onClick={handleClosePopup}>Close</button>
+                    </div>
                 </div>
-
-                {/* Event Flyers Grid */}
-                <div className="pin-container">
-                    {filteredEvents.map((event) => (
-                        <div key={event.id} className={`card card_medium`}>
-                            <img src={event.flyer_url} alt={event.title} className="h-full w-full object-cover rounded-lg"/>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            )}
         </div>
     );
 }

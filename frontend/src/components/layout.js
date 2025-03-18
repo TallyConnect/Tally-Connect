@@ -7,6 +7,7 @@ function Layout() {
     const location = useLocation();
     const [role, setRole] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [events, setEvents] = useState([]);
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
@@ -20,6 +21,10 @@ function Layout() {
                 console.error("Profile error:", error);
                 setIsAuthenticated(false);
             });
+        
+        axios.get("http://127.0.0.1:5000/api/events")
+            .then(response => setEvents(response.data))
+            .catch(error => console.error("Error fetching events:", error));
     }, []);
 
     const handleLogout = async () => {
