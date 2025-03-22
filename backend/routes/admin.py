@@ -72,3 +72,16 @@ def warn_user(username):
     db.close()
 
     return jsonify({"message": f"Warning issued and {username} suspended"}), 200
+
+@admin_bp.route('/admin/warnings', methods=['GET'])
+def list_all_warnings():
+    if "user" not in session or session["user"]["role"] != "Administrator":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM warnings")
+    warnings = cursor.fetchall()
+    db.close()
+
+    return jsonify(warnings)

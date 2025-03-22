@@ -54,13 +54,15 @@ function Layout() {
             { name: "Feedback/Reviews", path: "/feedback", icon: "fa-comments" },
             { name: "Explore", path: "/explore", icon: "fa-search" }
         ],
-        admin: [
+        administrator: [
             { name: "Home", path: "/home", icon: "fa-home" },
             { name: "Profile", path: "/profile", icon: "fa-user" },
-            { name: "Users", path: "/users", icon: "fa-users" },
+            { name: "Users", path: "/admin", icon: "fa-users" },
             { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
             { name: "Analytics", path: "/analysis", icon: "fa-chart-bar" },
-            { name: "Disputes", path: "/disputes", icon: "fa-exclamation-circle" }
+            { name: "Disputes", path: "/disputes", icon: "fa-exclamation-circle" },
+            { name: "Warnings", path: "/warnings", icon: "fa-exclamation-circle" }
+
         ],
         organizer: [
             { name: "Home", path: "/home", icon: "fa-home" },

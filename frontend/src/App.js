@@ -10,7 +10,7 @@ import Layout from "./components/layout";  // ✅ Import Layout
 import UploadFlyer from "./components/uploadflyer";
 import ModeratorEvents from "./components/modevents";
 import Explore from "./components/explore"; // or wherever you store your components
-
+import WarningsPage from "./components/warnings";
 
 
 function App() {
@@ -25,6 +25,7 @@ function App() {
                     <Route path="/upload-flyer" element={<UploadFlyer />} />
                     <Route path="/moderator/events" element={<ModeratorEvents />} />
                     <Route path="/explore" element={<Explore />} />
+                    <Route path="/warnings" element={<WarningsPage />} />
                 </Route>
 
                 <Route path="/" element={<Login />} /> 
