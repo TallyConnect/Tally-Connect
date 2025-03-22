@@ -9,6 +9,7 @@ CREATE TABLE events (
     event_status ENUM('Scheduled', 'Canceled', 'Completed') NOT NULL,
     event_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     event_last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    flyer_url VARCHAR(500),
     PRIMARY KEY (event_id), 
     FOREIGN KEY (user_name) REFERENCES users(user_name) ON DELETE CASCADE
 );

@@ -8,6 +8,10 @@ import AdminDashboard from "./components/admin";  // ✅ Import Admin Page
 import Home from "./components/home";  // ✅ Import Home Page
 import Layout from "./components/layout";  // ✅ Import Layout
 import UploadFlyer from "./components/uploadflyer";
+import ModeratorEvents from "./components/modevents";
+import Explore from "./components/explore"; // or wherever you store your components
+
+
 
 function App() {
     return (
@@ -19,6 +23,8 @@ function App() {
                     <Route path="/admin" element={<AdminDashboard />} />  {/* ✅ New Route for Admin */}
                     <Route path="/home" element={<Home />} />  {/* ✅ New Route for Home */}
                     <Route path="/upload-flyer" element={<UploadFlyer />} />
+                    <Route path="/moderator/events" element={<ModeratorEvents />} />
+                    <Route path="/explore" element={<Explore />} />
                 </Route>
 
                 <Route path="/" element={<Login />} /> 
