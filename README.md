@@ -46,9 +46,12 @@ This data dictionary defines the structure, attributes, and constraints of the T
 | event_location   | varchar  | 50           | Not null                             | Address or venue of the event |
 | event_date       | Date     | -            | Not null                             | Date the event is scheduled |
 | event_time       | Time     | -            | Not null                             | Time the event is scheduled |
-| event_status     | ENUM('Scheduled', 'Canceled', 'Completed') | - | Not null | Current status of the event |
+| event_status     | ENUM('Draft, 'Scheduled', 'Canceled', 'Completed') | - | Not null | Current status of the event |
 | event_created    | Timestamp | -           | DEFAULT CURRENT_TIMESTAMP           | Date and time when the event was created |
 | event_last_updated | Timestamp | -         | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Date and time when the event details were last updated |
+| flyer_url | varchar | 500         | Not Null | Flyer/image for the event listing |
+| moderator_approval | ENUM('Pending, 'Approved', 'Denied') | Not Null Default 'Pending'         | DEFAULT Default 'Pending' | Decision on whether an event is approved for listing by moderator |
+
 
 ## Event Registration Entity
 
