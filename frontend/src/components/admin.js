@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import "./admin.css"; // ✅ Add this import
 
 function AdminDashboard() {
     const [users, setUsers] = useState([]);
@@ -73,6 +74,7 @@ function AdminDashboard() {
     );
 
     return (
+        <div className="admin-dashboard">
         <div>
             <h2>Admin Dashboard</h2>
             {error && <p>{error}</p>}
@@ -134,6 +136,7 @@ function AdminDashboard() {
                     </div>
                 </div>
             )}
+        </div>
         </div>
     );
 }

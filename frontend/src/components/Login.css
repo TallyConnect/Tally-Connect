@@ -1,0 +1,82 @@
+.login-page {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.bg-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    z-index: -2;
+}
+
+.overlay {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: -1;
+}
+
+.login-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 40px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    z-index: 2;
+    width: 300px;
+    text-align: center;
+}
+
+.login-container .title {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.login-container .subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.login-container input,
+.login-container select,
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ecdf2d;
+}
+
+.login-container button {
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+}
+
+.login-container button:hover {
+    background-color: #4b0849;
+}
+
+.signup-text {
+    margin-top: 10px;
+    color: #ffffff;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
+}
