@@ -41,9 +41,13 @@ function Login() {
                 }
             }
         } catch (err) {
-            console.error("Login Error:", err.response ? err.response.data : err);
-            setError("Invalid login credentials");
+            if (err.response && err.response.data && err.response.data.error) {
+                setError(err.response.data.error);  // Show specific error
+            } else {
+                setError("Login failed. Please try again.");
+            }
         }
+        
     };
 
     return (

@@ -14,24 +14,36 @@ def login():
 
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
-    
-    cursor.execute("SELECT * FROM users WHERE user_name = %s AND user_password = %s AND role = %s", 
-                   (username, password, role))
+
+    # Step 1: Fetch the user regardless of status
+    cursor.execute(
+        "SELECT * FROM users WHERE user_name = %s AND user_password = %s AND role = %s",
+        (username, password, role)
+    )
     user = cursor.fetchone()
-    db.close()
 
     if not user:
-        print("User not found in database!")  # ✅ Debugging
+        db.close()
         return jsonify({"error": "Invalid credentials"}), 401
 
-    # ✅ Store user session
+    # Step 2: Check if user is suspended
+    if user["user_status"] == "Suspended":
+        db.close()
+        return jsonify({"error": "Account is suspended. Please contact support."}), 403
+
+
+    # Step 3: If status is Active, proceed with login
+    if user["user_status"] != "Active":
+        db.close()
+        return jsonify({"error": f"Account status is '{user['user_status']}'. Access denied."}), 403
+
     session["user"] = {
         "user_name": user["user_name"],
         "role": user["role"],
         "user_email": user["user_email"]
     }
-    session.permanent = True  # ✅ Ensure session persists across requests
-    print("Login successful!")  # ✅ Debugging output
+    session.permanent = True
+    db.close()
 
     return jsonify({"message": "Login successful", "user": session["user"]})
 
