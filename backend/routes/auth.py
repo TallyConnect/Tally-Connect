@@ -30,6 +30,11 @@ def login():
     if user["user_status"] == "Suspended":
         db.close()
         return jsonify({"error": "Account is suspended. Please contact support."}), 403
+    
+    if user["user_status"] == "Banned":
+        db.close()
+        return jsonify({"error": "Account is banned. Access permanently denied."}), 403
+
 
 
     # Step 3: If status is Active, proceed with login

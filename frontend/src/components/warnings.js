@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./admin.css";
 
 function WarningsPage() {
     const [warnings, setWarnings] = useState([]);
@@ -15,7 +16,7 @@ function WarningsPage() {
     }, []);
 
     return (
-        <div>
+        <div className="admin-dashboard">
             <h2>Warnings Log</h2>
             {error && <p>{error}</p>}
             <table>
@@ -45,5 +46,6 @@ function WarningsPage() {
         </div>
     );
 }
+
 
 export default WarningsPage;

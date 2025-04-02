@@ -85,3 +85,20 @@ def list_all_warnings():
     db.close()
 
     return jsonify(warnings)
+
+
+# ✅ Ban a user account
+@admin_bp.route('/admin/users/<username>/ban', methods=['POST'])
+def ban_user(username):
+    if "user" not in session or session["user"]["role"] != "Administrator":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute("UPDATE users SET user_status = 'Banned' WHERE user_name = %s", (username,))
+    db.commit()
+    db.close()
+    return jsonify({"message": f"User '{username}' banned successfully"})
+
+
+

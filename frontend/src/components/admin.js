@@ -36,7 +36,13 @@ function AdminDashboard() {
                 setUsers(prev =>
                     prev.map(user =>
                         user.user_name === username
-                            ? { ...user, user_status: action === "activate" ? "Active" : "Suspended" }
+                            ? { ...user, user_status: action === "activate"
+                                ? "Active"
+                                : action === "deactivate"
+                                ? "Deactivated"
+                                : action === "ban"
+                                ? "Banned"
+                                : user.user_status }
                             : user
                     )
                 );
@@ -106,6 +112,7 @@ function AdminDashboard() {
                             <td>
                                 <button onClick={() => handleStatusChange(user.user_name, "activate")}>Activate</button>
                                 <button onClick={() => handleStatusChange(user.user_name, "deactivate")}>Deactivate</button>
+                                <button onClick={() => handleStatusChange(user.user_name, "ban")}>Ban</button>
                                 <button onClick={() => openWarningModal(user)}>Warn</button>
                             </td>
                         </tr>
