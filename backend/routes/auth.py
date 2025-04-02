@@ -45,7 +45,10 @@ def login():
     session["user"] = {
         "user_name": user["user_name"],
         "role": user["role"],
-        "user_email": user["user_email"]
+        "user_email": user["user_email"],
+        "user_status": user["user_status"],
+        "user_contact_details": user["user_contact_details"],
+        "user_preferences": user["user_preferences"]
     }
     session.permanent = True
     db.close()

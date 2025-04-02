@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, flash
+from flask import Blueprint, jsonify, request, flash, session
 from werkzeug.utils import secure_filename
 from config.db_config import get_db_connection
 import os
@@ -53,14 +53,12 @@ def upload_flyer():
     if not allowed_file(file.filename):
         return jsonify({"error": "Invalid file type"}), 400
 
-    # Generate unique filename and save flyer
     event_id = str(uuid.uuid4())[:8]
     filename = f"{event_id}_{secure_filename(file.filename)}"
     flyer_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(flyer_path)
     flyer_url = f"/static/flyers/{filename}"
 
-    # Use stored procedure to insert event
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -71,9 +69,9 @@ def upload_flyer():
             event_location,
             event_date,
             event_time,
-            'Draft',  # Initial event status
+            'Draft',
             flyer_url,
-            'Pending'  # Initial moderator approval
+            'Pending'
         ))
         db.commit()
         db.close()
@@ -135,3 +133,43 @@ def delete_event(event_id):
     else:
         db.close()
         return jsonify({"error": "Event not found"}), 404
+
+@events_bp.route('/events/<event_id>', methods=['PUT'])
+def update_event(event_id):
+    if "user" not in session or session.get("user", {}).get("role") != "Organizer":
+        print("SESSION USER:", session.get("user"))
+        return jsonify({"error": "Unauthorized"}), 403
+
+    user_name = session.get("user", {}).get("user_name")
+
+    event_title = request.form.get("event_title")
+    event_description = request.form.get("event_description")
+    event_location = request.form.get("event_location")
+    event_date = request.form.get("event_date")
+    event_time = request.form.get("event_time")
+
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM events WHERE event_id = %s AND user_name = %s", (event_id, user_name))
+    existing_event = cursor.fetchone()
+
+    if not existing_event:
+        db.close()
+        return jsonify({"error": "Event not found or unauthorized"}), 404
+
+    cursor.execute("""
+        UPDATE events SET event_title = %s, event_description = %s, event_location = %s,
+        event_date = %s, event_time = %s, event_last_updated = CURRENT_TIMESTAMP
+        WHERE event_id = %s
+    """, (
+        event_title,
+        event_description,
+        event_location,
+        event_date,
+        event_time,
+        event_id
+    ))
+
+    db.commit()
+    db.close()
+    return jsonify({"message": "Event updated successfully"}), 200
