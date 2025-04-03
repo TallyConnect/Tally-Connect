@@ -119,3 +119,15 @@ This data dictionary defines the structure, attributes, and constraints of the T
 | warning_resolution | Boolean  | -            | Default false                        | Resolution for an event issued a warning |
 
 
+## Sourcing Files
+Source the files for the MySQL database in this order:
+- procedures.sql
+- users.sql
+- events.sql
+- eventlist.sql
+- eventRegistrations.sql
+- analyticsReports.sql
+- announcements.sql
+- disputes.sql
+- feedback.sql
+- warning.sql
