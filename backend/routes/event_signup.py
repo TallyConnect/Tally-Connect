@@ -60,3 +60,24 @@ def unregister_from_event():
 
     print("User successfully unregistered from event")
     return jsonify({"message": "You have successfully unregistered from the event"}), 200
+
+@event_signup_bp.route('/user_calendar', methods=['GET'])
+def get_user_calendar():
+    if "user" not in session:
+        return jsonify({"error": "You are not logged in"}), 401
+
+    user_name = session["user"]["user_name"]
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT e.event_id, e.event_title, e.event_date, e.event_time, e.event_location
+        FROM eventRegistrations er
+        JOIN events e ON er.event_id = e.event_id
+        WHERE er.user_name = %s
+    """, (user_name,))
+
+    events = cursor.fetchall()
+    db.close()
+
+    return jsonify(events)

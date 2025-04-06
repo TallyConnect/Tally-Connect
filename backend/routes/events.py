@@ -93,9 +93,9 @@ def get_events():
     cursor = db.cursor(dictionary=True)
 
     if role == 'organizer':
-        cursor.execute("SELECT event_id, event_title, flyer_url FROM events WHERE user_name = %s", (username,))
+        cursor.execute("SELECT event_id, event_title, flyer_url, event_location, event_date, event_time FROM events WHERE user_name = %s", (username,))
     else:
-        cursor.execute("SELECT event_id, event_title, flyer_url FROM events WHERE event_status = 'Scheduled' AND moderator_approval = 'Approved'")
+        cursor.execute("SELECT event_id, event_title, flyer_url, event_location, event_date, event_time FROM events WHERE event_status = 'Scheduled' AND moderator_approval = 'Approved'")
 
     events = cursor.fetchall()
     db.close()

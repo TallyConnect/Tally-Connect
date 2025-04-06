@@ -9,6 +9,7 @@ function Home() {
     const [user, setUser] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
@@ -32,24 +33,44 @@ function Home() {
     if (!user) return <p>Loading profile...</p>;
 
     const handleFlyerClick = (event) => {
+        console.log("Selected Event:", event);
         setSelectedEvent(event);
         setShowPopup(true);
+        setErrorMessage(""); // Reset error message when opening popup
     };
 
     const handleClosePopup = () => {
         setShowPopup(false);
         setSelectedEvent(null);
+        setErrorMessage(""); // Reset error message when closing popup
     };
 
     const handleRegister = () => {
+        if (!selectedEvent) return; // Ensure selectedEvent exists before proceeding
+
+        const registrants = selectedEvent.registrants || [];  // Default to an empty array if undefined
+        const isAlreadyRegistered = registrants.includes(user.user_name);
+
+        if (isAlreadyRegistered) {
+            setErrorMessage("You are already registered for this event.");
+            return;
+        }
+
         axios.post("http://127.0.0.1:5000/api/signup_event", { event_id: selectedEvent.event_id }, { withCredentials: true })
             .then(response => {
-                alert(response.data.message);
-                handleClosePopup();
+                if (response.data.message) {
+                    alert(response.data.message);
+                    handleClosePopup();
+                }
             })
             .catch(error => {
                 console.error("Registration error:", error);
-                alert("Error registering for the event.");
+
+                if (error.response && error.response.status === 400 && error.response.data.message) {
+                    setErrorMessage(error.response.data.message);
+                } else {
+                    setErrorMessage("An error occurred while registering. Please try again.");
+                }
             });
     };
 
@@ -150,14 +171,17 @@ function Home() {
             </div>
 
             {/* Popup Modal for Registration */}
-            {showPopup && (
+            {showPopup && selectedEvent && (
                 <div className="popup-overlay">
                     <div className="popup">
-                        <h2>{selectedEvent.event_title}</h2>
-                        <p>{selectedEvent.event_description}</p>
-                        <p>Location: {selectedEvent.event_location}</p>
-                        <p>Date: {selectedEvent.event_date}</p>
-                        <p>Time: {selectedEvent.event_time}</p>
+                        <h2>{selectedEvent.event_title || "No Title Available"}</h2>
+                        <p>{selectedEvent.event_description || "No Description Available"}</p>
+                        <p>Location: {selectedEvent.event_location || "No Location Available"}</p>
+                        <p>Date: {selectedEvent.event_date || "No Date Available"}</p>
+                        <p>Time: {selectedEvent.event_time || "No Time Available"}</p>
+
+                        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+                        
                         <button onClick={handleRegister}>Register</button>
                         <button onClick={handleClosePopup}>Close</button>
                     </div>
