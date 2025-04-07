@@ -38,9 +38,7 @@ def login():
 
 
     # Step 3: If status is Active, proceed with login
-    if user["user_status"] != "Active":
-        db.close()
-        return jsonify({"error": f"Account status is '{user['user_status']}'. Access denied."}), 403
+   
 
     session["user"] = {
         "user_name": user["user_name"],

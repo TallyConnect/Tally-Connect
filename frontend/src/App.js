@@ -12,6 +12,7 @@ import ModeratorEvents from "./components/modevents";
 import Explore from "./components/explore"; // or wherever you store your components
 import WarningsPage from "./components/warnings";
 import Calendar from "./components/calendar";
+import Feedback from "./components/feedback"; // ✅ Import the feedback page
 
 
 function App() {
@@ -28,6 +29,8 @@ function App() {
                     <Route path="/explore" element={<Explore />} />
                     <Route path="/warnings" element={<WarningsPage />} />
                     <Route path="/calendar" element={<Calendar />} /> {/* Add the route for Calendar */}
+                    <Route path="/feedback" element={<Feedback />} />
+
                 </Route>
 
                 <Route path="/" element={<Login />} /> 

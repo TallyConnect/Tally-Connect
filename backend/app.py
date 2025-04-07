@@ -8,7 +8,7 @@ from routes.events import events_bp
 from routes.admin import admin_bp
 from routes.logout import logout_bp
 from routes.moderation import moderation_bp
-
+from routes.feedback import feedback_bp
 
 
 app = Flask(__name__)
@@ -28,6 +28,7 @@ app.register_blueprint(events_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/api')
 app.register_blueprint(logout_bp, url_prefix='/api')
 app.register_blueprint(moderation_bp, url_prefix='/api')
+app.register_blueprint(feedback_bp, url_prefix='/api')  
 
 if __name__ == '__main__':
     print("Starting Flask App...")  # ✅ Debugging output
