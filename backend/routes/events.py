@@ -3,7 +3,8 @@ from werkzeug.utils import secure_filename
 from config.db_config import get_db_connection
 import os
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+import pytz
 
 events_bp = Blueprint('events', __name__, url_prefix='/api')
 
@@ -17,14 +18,21 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def serialize_event(event):
-    if isinstance(event.get('event_date'), datetime):
+    if isinstance(event.get('event_date'), (datetime, date)):
         event['event_date'] = event['event_date'].isoformat()
     if isinstance(event.get('event_time'), timedelta):
-        event['event_time'] = str(event['event_time'])
-    if isinstance(event.get('event_created'), datetime):
-        event['event_created'] = event['event_created'].isoformat()
-    if isinstance(event.get('event_last_updated'), datetime):
-        event['event_last_updated'] = event['event_last_updated'].isoformat()
+        total_seconds = int(event['event_time'].total_seconds())
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        event['event_time'] = f"{hours:02}:{minutes:02}"
+    elif isinstance(event.get('event_time'), str):
+        event['event_time'] = event['event_time']  # Ensure it's a string
+    else:
+        event['event_time'] = "00:00"  # Default fallback
+
+    # Combine event_date and event_time into a datetime field
+    if 'event_date' in event and 'event_time' in event:
+        event['datetime'] = f"{event['event_date']}T{event['event_time']}:00+00:00"
 
     print("Serialized Event Data:", event)
     return event
@@ -44,7 +52,7 @@ def upload_flyer():
     event_title = request.form.get("event_title")
     event_description = request.form.get("event_description")
     event_location = request.form.get("event_location")
-    event_date = request.form.get("event_date")
+    event_date = datetime.strptime(request.form.get("event_date"), "%Y-%m-%d").date()
     event_time = request.form.get("event_time")
 
     if not file or not event_title or not event_location or not event_date or not event_time or not event_description:
@@ -62,6 +70,10 @@ def upload_flyer():
     try:
         db = get_db_connection()
         cursor = db.cursor()
+
+        tz = pytz.timezone('UTC')  # Use UTC to avoid mismatches
+        event_datetime = datetime.combine(event_date, datetime.min.time())
+        event_datetime = tz.localize(event_datetime)
         cursor.callproc("insert_event", (
             user_name,
             event_title,
@@ -145,7 +157,7 @@ def update_event(event_id):
     event_title = request.form.get("event_title")
     event_description = request.form.get("event_description")
     event_location = request.form.get("event_location")
-    event_date = request.form.get("event_date")
+    event_date = datetime.strptime(request.form.get("event_date"), "%Y-%m-%d").date()
     event_time = request.form.get("event_time")
 
     db = get_db_connection()
@@ -156,6 +168,10 @@ def update_event(event_id):
     if not existing_event:
         db.close()
         return jsonify({"error": "Event not found or unauthorized"}), 404
+    
+    tz = pytz.timezone('UTC')  # Ensure that the event date is stored in UTC
+    event_datetime = datetime.combine(event_date, datetime.min.time())
+    event_datetime = tz.localize(event_datetime)
 
     cursor.execute("""
         UPDATE events SET event_title = %s, event_description = %s, event_location = %s,
@@ -165,7 +181,7 @@ def update_event(event_id):
         event_title,
         event_description,
         event_location,
-        event_date,
+        event_datetime,
         event_time,
         event_id
     ))

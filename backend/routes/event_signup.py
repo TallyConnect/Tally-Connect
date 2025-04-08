@@ -1,5 +1,28 @@
 from flask import Blueprint, request, jsonify,session
 from config.db_config import get_db_connection
+from datetime import datetime, timedelta
+import pytz
+
+def serialize_event_signup(event):
+    if 'event_date' in event and isinstance(event['event_date'], datetime):
+        event['event_date'] = event['event_date'].date().isoformat()
+
+    if 'event_time' in event:
+        if isinstance(event['event_time'], timedelta):
+            total_seconds = int(event['event_time'].total_seconds())
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            event['event_time'] = f"{hours:02}:{minutes:02}"
+        elif isinstance(event['event_time'], str):
+            event['event_time'] = event['event_time']  # Ensure it's a string
+        else:
+            event['event_time'] = "00:00"  # Default fallback
+
+    if 'event_time' in event:
+        event['event_datetime'] = f"{event['event_date']} {event['event_time']}"
+
+    return event
+
 
 event_signup_bp = Blueprint('event_signup', __name__, url_prefix='/api')
 
@@ -67,17 +90,58 @@ def get_user_calendar():
         return jsonify({"error": "You are not logged in"}), 401
 
     user_name = session["user"]["user_name"]
+    month = request.args.get('month', type=int)
+    year = request.args.get('year', type=int)
+
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT e.event_id, e.event_title, e.event_date, e.event_time, e.event_location
+    query = """
+        SELECT e.event_id, e.event_title, e.event_description, e.event_date, e.event_time, e.event_location
         FROM eventRegistrations er
         JOIN events e ON er.event_id = e.event_id
-        WHERE er.user_name = %s
-    """, (user_name,))
+        WHERE er.user_name = %s 
+    """
+    params = [user_name]
 
+    if month and year:
+        query += " AND MONTH(e.event_date) = %s AND YEAR(e.event_date) = %s"
+        params += [month, year]
+
+    cursor.execute(query, params)
     events = cursor.fetchall()
     db.close()
 
-    return jsonify(events)
+    utc = pytz.utc
+    event_list = []
+
+    for event in events:
+        if isinstance(event["event_date"], datetime):
+            event_date = event["event_date"].date()
+        else:
+            event_date = event["event_date"]
+
+        if isinstance(event["event_time"], timedelta):
+            total_seconds = int(event["event_time"].total_seconds())
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            event_time = f"{hours:02}:{minutes:02}"
+        else:
+            event_time = event["event_time"]
+
+        # Combine into datetime and localize
+        combined_datetime = datetime.strptime(f"{event_date} {event_time}", "%Y-%m-%d %H:%M")
+        event_datetime_utc = utc.localize(combined_datetime)
+
+        event_list.append({
+            "event_id": event["event_id"],
+            "event_title": event["event_title"],
+            "event_description": event["event_description"],
+            "event_location": event["event_location"],
+            "datetime": event_datetime_utc.isoformat(),  # UTC ISO format for JS
+        })
+
+    return jsonify(event_list)
+
+
+

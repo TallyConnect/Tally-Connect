@@ -28,7 +28,7 @@ function Events() {
         if (user) {
             axios.get(`http://127.0.0.1:5000/api/events?role=${user.role}&username=${user.user_name}`)
             .then(response => {
-                console.log("Fetched events:", response.data);
+                console.log("Fetched events:", response.data); // Log fetched events
                 setEvents(response.data);
             })
             .catch(error => console.error("Error fetching events:", error));
@@ -46,7 +46,7 @@ function Events() {
     const handleFileChange = (e) => setEventData({ ...eventData, selectedFile: e.target.files[0] });
 
     const handleUpload = async () => {
-        console.log(eventData); 
+        console.log(eventData); // Log event data before validation
 
         if (!eventData.selectedFile || !eventData.event_title || !eventData.event_date || !eventData.event_location) {
             alert("Please fill in all fields and upload a flyer.");
@@ -262,77 +262,74 @@ function Events() {
                     />
                     <p><strong>Description:</strong> {selectedEvent.event_description}</p>
                     <p><strong>Location:</strong> {selectedEvent.event_location}</p>
-                    <p><strong>Date:</strong> {selectedEvent.event_date}</p>
-                    <p><strong>Time:</strong> {selectedEvent.event_time}</p>
+                    <p><strong>Date & Time:</strong> {new Date(`${selectedEvent.event_date}T${selectedEvent.event_time}Z`).toLocaleString()}</p>
                     {user.role.toLowerCase() === "organizer" && user.user_name === selectedEvent.user_name ? (
-    <button
-        onClick={() => handleDeleteEvent(selectedEvent.event_id)}
-        className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md"
-    >
-        Delete Event
-    </button>
-) : null}
+                        <button
+                            onClick={() => handleDeleteEvent(selectedEvent.event_id)}
+                            className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md"
+                        >
+                            Delete Event
+                        </button>
+                    ) : null}
                     <button onClick={() => setShowEventDetailsPopup(false)} className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">Close</button>
                     {user.role.toLowerCase() === 'organizer' && user.user_name === selectedEvent.user_name && (
-    <button onClick={() => {
-        setEditingEvent(selectedEvent);
-        setEventData({
-            event_title: selectedEvent.event_title,
-            event_description: selectedEvent.event_description,
-            event_location: selectedEvent.event_location,
-            event_date: selectedEvent.event_date,
-            event_time: selectedEvent.event_time,
-            selectedFile: null
-        });
-    }} className="bg-yellow-500 text-white px-4 py-2 mt-2 rounded-md">Edit</button>
-)}
+                        <button onClick={() => {
+                            setEditingEvent(selectedEvent);
+                            setEventData({
+                                event_title: selectedEvent.event_title,
+                                event_description: selectedEvent.event_description,
+                                event_location: selectedEvent.event_location,
+                                event_date: selectedEvent.event_date,
+                                event_time: selectedEvent.event_time,
+                                selectedFile: null
+                            });
+                        }} className="bg-yellow-500 text-white px-4 py-2 mt-2 rounded-md">Edit</button>
+                    )}
+                </div>
+            )}
 
-{editingEvent && (
-    <div className="popup">
-        <h3>Edit Event</h3>
-        <input
-            type="text"
-            name="event_title"
-            placeholder="Event Title"
-            value={eventData.event_title}
-            onChange={handleChange}
-        />
-        <input
-            type="date"
-            name="event_date"
-            value={eventData.event_date}
-            onChange={handleChange}
-        />
-        <input
-            type="text"
-            name="event_location"
-            placeholder="Location"
-            value={eventData.event_location}
-            onChange={handleChange}
-        />
-        <input
-            type="time"
-            name="event_time"
-            value={eventData.event_time}
-            onChange={handleChange}
-        />
-        <textarea
-            name="event_description"
-            placeholder="Event Description"
-            value={eventData.event_description}
-            onChange={handleChange}
-        />
-        <input
-            type="file"
-            onChange={handleFileChange}
-            accept=".png,.jpg,.jpeg,.gif"
-        />
-        <button onClick={handleUpdateEvent} className="bg-blue-500 text-white px-4 py-2 mt-2 rounded-md">Save Changes</button>
-        <button onClick={() => setEditingEvent(null)} className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">Cancel</button>
-    </div>
-)}
-
-
+            {editingEvent && (
+                <div className="popup">
+                    <h3>Edit Event</h3>
+                    <input
+                        type="text"
+                        name="event_title"
+                        placeholder="Event Title"
+                        value={eventData.event_title}
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="date"
+                        name="event_date"
+                        value={eventData.event_date}
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="text"
+                        name="event_location"
+                        placeholder="Location"
+                        value={eventData.event_location}
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="time"
+                        name="event_time"
+                        value={eventData.event_time}
+                        onChange={handleChange}
+                    />
+                    <textarea
+                        name="event_description"
+                        placeholder="Event Description"
+                        value={eventData.event_description}
+                        onChange={handleChange}
+                    />
+                    <input
+                        type="file"
+                        onChange={handleFileChange}
+                        accept=".png,.jpg,.jpeg,.gif"
+                    />
+                    <button onClick={handleUpdateEvent} className="bg-blue-500 text-white px-4 py-2 mt-2 rounded-md">Save Changes</button>
+                    <button onClick={() => setEditingEvent(null)} className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">Cancel</button>
                 </div>
             )}
         </div>
