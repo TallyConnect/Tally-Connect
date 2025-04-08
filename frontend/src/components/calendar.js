@@ -178,18 +178,20 @@ function Calendar() {
                 ) : (
                     <ul className="sidebar__list">
                         {events.length > 0 ? (
-                            events.map(event => {
-                                const eventDate = new Date(event.event_date);
-                                const isValidDate = !isNaN(eventDate); // Check if the date is valid
-                                return (
-                                    <li key={event.event_id} className="sidebar__list-item">
-                                        <span>{event.event_title}</span>
-                                        <span className="list-item__time">
-                                            {isValidDate ? eventDate.toLocaleDateString() : "Invalid Date"}
-                                        </span>
-                                    </li>
-                                );
-                            })
+                            [...events]
+                                .sort((a, b) => new Date(a.datetime) - new Date(b.datetime))
+                                .map(event => {
+                                    const eventDate = new Date(event.datetime);
+                                    const isValidDate = !isNaN(eventDate); // Check if the date is valid
+                                    return (
+                                        <li key={event.event_id} className="sidebar__list-item">
+                                            <span>{event.event_title}</span>
+                                            <span className="list-item__time">
+                                                {isValidDate ? eventDate.toLocaleDateString() : "Invalid Date"}
+                                            </span>
+                                        </li>
+                                 );
+                                })
                         ) : (
                             <p className="text-gray-500 text-sm">You haven’t registered for any upcoming events.</p>
                         )}

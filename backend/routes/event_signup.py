@@ -29,7 +29,7 @@ event_signup_bp = Blueprint('event_signup', __name__, url_prefix='/api')
 @event_signup_bp.route('/signup_event', methods=['POST'])
 def signup_for_event():
     if "user" not in session:
-        return jsonify({"error": "You are not logged in"}), 401
+        return jsonify({"message": "You are not logged in"}), 401
     
     data = request.json
     event_id = data.get("event_id")
@@ -46,7 +46,7 @@ def signup_for_event():
     if existing_registration:
         db.close()
         print("User already registered for event")
-        return jsonify({"error": "You are already registered for this event"}), 400
+        return jsonify({"message": "You are already registered for this event"}), 400
     
     cursor.execute("INSERT INTO eventRegistrations (event_id, user_name, registration_status) VALUES (%s, %s, %s)", (event_id, user_name, True))
     db.commit()
@@ -58,7 +58,7 @@ def signup_for_event():
 @event_signup_bp.route('/unregister_event', methods=['DELETE'])
 def unregister_from_event():
     if "user" not in session:
-        return jsonify({"error": "You are not logged in"}), 401
+        return jsonify({"message": "You are not logged in"}), 401
     
     data = request.json
     event_id = data.get("event_id")
@@ -75,7 +75,7 @@ def unregister_from_event():
     if not existing_registration:
         db.close()
         print("User is  not registered for this event")
-        return jsonify({"error": "You are not registered for this event"}), 400
+        return jsonify({"message": "You are not registered for this event"}), 400
     
     cursor.execute("DELETE FROM eventRegistrations WHERE event_id = %s AND user_name = %s", (event_id, user_name))
     db.commit()
@@ -87,7 +87,7 @@ def unregister_from_event():
 @event_signup_bp.route('/user_calendar', methods=['GET'])
 def get_user_calendar():
     if "user" not in session:
-        return jsonify({"error": "You are not logged in"}), 401
+        return jsonify({"message": "You are not logged in"}), 401
 
     user_name = session["user"]["user_name"]
     month = request.args.get('month', type=int)

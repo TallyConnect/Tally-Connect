@@ -48,14 +48,6 @@ function Home() {
     const handleRegister = () => {
         if (!selectedEvent) return; // Ensure selectedEvent exists before proceeding
 
-        const registrants = selectedEvent.registrants || [];  // Default to an empty array if undefined
-        const isAlreadyRegistered = registrants.includes(user.user_name);
-
-        if (isAlreadyRegistered) {
-            setErrorMessage("You are already registered for this event.");
-            return;
-        }
-
         axios.post("http://127.0.0.1:5000/api/signup_event", { event_id: selectedEvent.event_id }, { withCredentials: true })
             .then(response => {
                 if (response.data.message) {
@@ -66,8 +58,14 @@ function Home() {
             .catch(error => {
                 console.error("Registration error:", error);
 
-                if (error.response && error.response.status === 400 && error.response.data.message) {
-                    setErrorMessage(error.response.data.message);
+                if (error.response && error.response.data?.message) {
+                    const message = error.response.data.message;
+
+                    if(message === "You are already registered for this event.") {
+                        setErrorMessage(message);
+                    } else {
+                        setErrorMessage("An error occured: " + message);
+                    }
                 } else {
                     setErrorMessage("An error occurred while registering. Please try again.");
                 }
