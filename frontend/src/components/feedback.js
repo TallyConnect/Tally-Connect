@@ -41,9 +41,10 @@ function Feedback() {
 
     const isOrganizerView = Array.isArray(feedback) && feedback.length > 0 && feedback[0].hasOwnProperty("attendee_count");
 
-    // Calculate total attendee count
+    // ✅ Fixed: Calculate total attendees using unique event_id
     const totalAttendees = isOrganizerView
-        ? feedback.reduce((sum, item) => sum + (item.attendee_count || 0), 0)
+        ? Array.from(new Map(feedback.map(item => [item.event_id, item.attendee_count])).values())
+            .reduce((sum, count) => sum + count, 0)
         : 0;
 
     return (
