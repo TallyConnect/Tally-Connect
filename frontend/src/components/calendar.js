@@ -24,7 +24,12 @@ function Calendar() {
     useEffect(() => {
         if (user) {
             setLoading(true);
-            axios.get(`http://127.0.0.1:5000/api/user_calendar`, { 
+
+            const endpoint = user.role === "Organizer"
+                ? "http://127.0.0.1:5000/api/organizer_calendar"
+                : "http://127.0.0.1:5000/api/user_calendar";
+
+            axios.get(endpoint, {
                 withCredentials: true,
                 params: {
                     month: currentMonth + 1,
@@ -32,7 +37,7 @@ function Calendar() {
                 }
             })
             .then(response => {
-                console.log("Fetched Events:", response.data); // Debugging
+                console.log("Fetched Events:", response.data);
                 setEvents(response.data);
                 setLoading(false);
             })
@@ -75,22 +80,20 @@ function Calendar() {
         const calendarDays = [];
 
         for (let i = 0; i < firstDayIndex; i++) {
-            calendarDays.push(
-                <div key={`empty-${i}`} className="calendar__day empty"></div>
-            );
+            calendarDays.push(<div key={`empty-${i}`} className="calendar__day empty"></div>);
         }
 
         for (let i = 1; i <= daysInMonth; i++) {
             const dayEvents = events.filter(event => {
-                const eventDate = new Date(event.datetime); // Parse datetime as UTC
+                const eventDate = new Date(event.datetime);
                 return eventDate.getUTCDate() === i &&
                        eventDate.getUTCMonth() === currentMonth &&
                        eventDate.getUTCFullYear() === currentYear;
             });
 
             const isToday =
-                i === today.getDate() && 
-                currentMonth === today.getMonth() && 
+                i === today.getDate() &&
+                currentMonth === today.getMonth() &&
                 currentYear === today.getFullYear();
 
             calendarDays.push(
@@ -117,21 +120,18 @@ function Calendar() {
 
     const handleDayClick = (day) => {
         const eventOnDay = events.filter(event => {
-            const eventDate = new Date(event.datetime); // Parse datetime as UTC
+            const eventDate = new Date(event.datetime);
             return eventDate.getUTCDate() === day &&
-                eventDate.getUTCMonth() === currentMonth &&
-                eventDate.getUTCFullYear() === currentYear;
+                   eventDate.getUTCMonth() === currentMonth &&
+                   eventDate.getUTCFullYear() === currentYear;
         });
 
         if (eventOnDay.length > 0) {
-            console.log("Event on Day:", eventOnDay); // Debugging
             setSelectedEvent(eventOnDay[0]);
         }
     };
 
-    const closeEventDetails = () => {
-        setSelectedEvent(null);
-    };
+    const closeEventDetails = () => setSelectedEvent(null);
 
     const handleUnregister = () => {
         if (!selectedEvent) return;
@@ -152,12 +152,12 @@ function Calendar() {
     };
 
     const formatTime = (datetime) => {
-        if (!datetime) return 'N/A'; // Handle missing datetime
+        if (!datetime) return 'N/A';
         const date = new Date(datetime);
         return date.toLocaleTimeString('en-US', { 
             hour: '2-digit', 
             minute: '2-digit', 
-            timeZone: 'UTC' // Ensure time is displayed in UTC
+            timeZone: 'UTC' 
         });
     };
 
@@ -165,9 +165,7 @@ function Calendar() {
         <div className="calendar-contain">
             <div className="calendar__title-bar">
                 <button onClick={handlePrevMonth}>&lt;</button>
-                <div>
-                    {monthNames[currentMonth]} {currentYear}
-                </div>
+                <div>{monthNames[currentMonth]} {currentYear}</div>
                 <button onClick={handleNextMonth}>&gt;</button>
             </div>
 
@@ -182,7 +180,7 @@ function Calendar() {
                                 .sort((a, b) => new Date(a.datetime) - new Date(b.datetime))
                                 .map(event => {
                                     const eventDate = new Date(event.datetime);
-                                    const isValidDate = !isNaN(eventDate); // Check if the date is valid
+                                    const isValidDate = !isNaN(eventDate);
                                     return (
                                         <li key={event.event_id} className="sidebar__list-item">
                                             <span>{event.event_title}</span>
@@ -190,10 +188,14 @@ function Calendar() {
                                                 {isValidDate ? eventDate.toLocaleDateString() : "Invalid Date"}
                                             </span>
                                         </li>
-                                 );
+                                    );
                                 })
                         ) : (
-                            <p className="text-gray-500 text-sm">You haven’t registered for any upcoming events.</p>
+                            <p className="text-gray-500 text-sm">
+                                {user.role === "Organizer"
+                                    ? "You haven’t created any upcoming events."
+                                    : "You haven’t registered for any upcoming events."}
+                            </p>
                         )}
                     </ul>
                 )}
@@ -215,7 +217,6 @@ function Calendar() {
 
             {selectedEvent && (
                 <div className="event-popup">
-                    {console.log("Selected Event:", selectedEvent)} {/* Debugging */}
                     <div className="event-popup-content">
                         <h3>{selectedEvent.event_title}</h3>
                         <p>{selectedEvent.event_description}</p>
@@ -226,7 +227,28 @@ function Calendar() {
                                 <p><strong>Time:</strong> {formatTime(selectedEvent.datetime)}</p>
                             </>
                         )}
-                        <button onClick={handleUnregister}>Unregister</button>
+                        {user.role === "Organizer" ? (
+                            <button
+                                onClick={() => {
+                                    axios.delete(`http://127.0.0.1:5000/api/events/${selectedEvent.event_id}`, {
+                                        withCredentials: true
+                                    })
+                                    .then(res => {
+                                        setMessage(res.data.message);
+                                        setEvents(prev => prev.filter(e => e.event_id !== selectedEvent.event_id));
+                                        setSelectedEvent(null);
+                                    })
+                                    .catch(err => {
+                                        console.error("Delete failed:", err);
+                                        setMessage("Failed to delete event");
+                                    });
+                                }}
+                            >
+                                Delete Event
+                            </button>
+                        ) : (
+                            <button onClick={handleUnregister}>Unregister</button>
+                        )}
                         <button onClick={closeEventDetails}>Close</button>
                     </div>
                 </div>

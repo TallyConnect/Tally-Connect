@@ -189,3 +189,66 @@ def update_event(event_id):
     db.commit()
     db.close()
     return jsonify({"message": "Event updated successfully"}), 200
+
+@events_bp.route('/organizer_calendar', methods=['GET'])
+def organizer_calendar():
+    if "user" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user = session["user"]
+    if user["role"].lower() != "organizer":
+        return jsonify({"error": "Access denied"}), 403
+
+    month = int(request.args.get("month"))
+    year = int(request.args.get("year"))
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT event_id, event_title, event_description, event_location,
+               event_date, event_time
+        FROM events
+        WHERE user_name = %s AND MONTH(event_date) = %s AND YEAR(event_date) = %s
+    """, (user["user_name"], month, year))
+
+    events = cursor.fetchall()
+    db.close()
+
+    for event in events:
+        event["datetime"] = f"{event['event_date']}T{event['event_time']}:00+00:00"
+
+    serialize_events = [serialize_event(event) for event in events]
+    return jsonify(serialize_events), 200
+
+
+@events_bp.route('/user_calendar', methods=['GET'])
+def user_calendar():
+    if "user" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user = session["user"]
+    if user["role"].lower() not in ["user", "participant"]:
+        return jsonify({"error": "Access denied"}), 403
+
+    month = int(request.args.get("month"))
+    year = int(request.args.get("year"))
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT e.event_id, e.event_title, e.event_description, e.event_location,
+               e.event_date, e.event_time
+        FROM events e
+        JOIN eventRegistrations r ON e.event_id = r.event_id
+        WHERE r.user_name = %s AND MONTH(e.event_date) = %s AND YEAR(e.event_date) = %s
+    """, (user["user_name"], month, year))
+
+    events = cursor.fetchall()
+    db.close()
+
+    for event in events:
+        event["datetime"] = f"{event['event_date']}T{event['event_time']}:00+00:00"
+
+    return jsonify(events), 200
