@@ -31,16 +31,12 @@ function Analytics() {
                         <thead>
                             <tr>
                                 <th>Event Title</th>
-                                <th>Attendee Count</th>
-                                <th>Average Rating</th>
                             </tr>
                         </thead>
                         <tbody>
                             {org.events.map((event, idx) => (
                                 <tr key={idx}>
                                     <td>{event.event_title}</td>
-                                    <td>{event.attendee_count}</td>
-                                    <td>{event.average_rating ? event.average_rating.toFixed(2) : "—"}</td>
                                 </tr>
                             ))}
                         </tbody>
