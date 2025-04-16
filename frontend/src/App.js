@@ -13,7 +13,9 @@ import Explore from "./components/explore"; // or wherever you store your compon
 import WarningsPage from "./components/warnings";
 import Calendar from "./components/calendar";
 import Feedback from "./components/feedback"; // ✅ Import the feedback page
-
+import Disputes from "./components/disputes";
+import SubmitDisputePage from "./components/submitdisputes"; // <-- User/Organizer submit
+import MyDisputesPage from "./components/mydisputes";       // <-- Optional user view
 
 function App() {
     return (
@@ -30,7 +32,10 @@ function App() {
                     <Route path="/warnings" element={<WarningsPage />} />
                     <Route path="/calendar" element={<Calendar />} /> {/* Add the route for Calendar */}
                     <Route path="/feedback" element={<Feedback />} />
-
+                    <Route path="/disputes" element={<Disputes />} />
+                    <Route path="/submit-dispute" element={<SubmitDisputePage />} />
+                    <Route path="/my-disputes" element={<MyDisputesPage />} />
+                    
                 </Route>
 
                 <Route path="/" element={<Login />} /> 

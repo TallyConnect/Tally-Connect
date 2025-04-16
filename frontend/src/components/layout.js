@@ -52,7 +52,8 @@ function Layout() {
             { name: "Profile", path: "/profile", icon: "fa-user" },
             { name: "Calendar", path: "/calendar", icon: "fa-calendar" },
             { name: "Feedback/Reviews", path: "/feedback", icon: "fa-comments" },
-            { name: "Explore", path: "/explore", icon: "fa-search" }
+            { name: "Explore", path: "/explore", icon: "fa-search" },
+            { name: "My Disputes", path: "/my-disputes", icon: "fa-exclamation-circle" }
         ],
         administrator: [
             { name: "Home", path: "/home", icon: "fa-home" },
@@ -70,7 +71,8 @@ function Layout() {
             { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
             { name: "Calendar", path: "/calendar", icon: "fa-calendar" },
             { name: "Feedback/Reviews", path: "/feedback", icon: "fa-comments" },
-            { name: "Analytics", path: "/analysis", icon: "fa-chart-bar" }
+            { name: "Analytics", path: "/analysis", icon: "fa-chart-bar" },
+            { name: "My Disputes", path: "/my-disputes", icon: "fa-exclamation-circle" }
         ],
         moderator: [
             { name: "Home", path: "/home", icon: "fa-home" },
