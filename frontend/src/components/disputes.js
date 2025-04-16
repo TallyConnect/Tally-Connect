@@ -4,17 +4,21 @@ import "./admin.css";
 
 function Disputes() {
     const [disputes, setDisputes] = useState([]);
-    const [moderator, setModerator] = useState("");
+    const [administrator, setAdministrator] = useState("");
     const [editingId, setEditingId] = useState(null);
     const [resolutionText, setResolutionText] = useState("");
     const [messageDispute, setMessageDispute] = useState(null);
-    const [moderatorMessage, setModeratorMessage] = useState("");
+    const [adminMessage, setAdminMessage] = useState("");
     const [confirmationMessage, setConfirmationMessage] = useState("");
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
-            .then(response => setModerator(response.data.user_name))
-            .catch(error => console.error("Failed to fetch moderator profile", error));
+            .then(response => {
+                if (response.data.user_name) {
+                    setAdministrator(response.data.user_name);
+                }
+            })
+            .catch(error => console.error("Failed to fetch administrator profile", error));
 
         axios.get("http://127.0.0.1:5000/api/disputes", { withCredentials: true })
             .then(response => setDisputes(response.data))
@@ -39,17 +43,22 @@ function Disputes() {
     };
 
     const handleSendMessage = (dispute) => {
-        axios.post("http://127.0.0.1:5000/api/moderator_request", {
+        if (!adminMessage.trim()) {
+            setConfirmationMessage("Message cannot be empty.");
+            return;
+        }
+
+        axios.post("http://127.0.0.1:5000/api/admin_request", {
             dispute_id: dispute.dispute_id,
             event_id: dispute.event_id,
-            moderator_id: moderator,
+            admin_id: administrator,
             organizer_id: dispute.organizer_id,
-            request_message: moderatorMessage
+            request_message: adminMessage
         }, { withCredentials: true })
         .then(() => {
             setConfirmationMessage("Message sent to organizer successfully.");
             setMessageDispute(null);
-            setModeratorMessage("");
+            setAdminMessage("");
         })
         .catch(err => {
             console.error("Failed to send message to organizer", err);
@@ -116,11 +125,11 @@ function Disputes() {
                 <div className="modal">
                     <h3>Message Organizer</h3>
                     <p>
-                        <strong>Moderator {moderator}</strong> wants to message the organizer about event <strong>{messageDispute.event_id}</strong>.
+                        <strong>Administrator {administrator}</strong> wants to message the organizer about event <strong>{messageDispute.event_id}</strong>.
                     </p>
                     <textarea
-                        value={moderatorMessage}
-                        onChange={(e) => setModeratorMessage(e.target.value)}
+                        value={adminMessage}
+                        onChange={(e) => setAdminMessage(e.target.value)}
                         rows={4}
                         placeholder="Enter your message to the organizer"
                         style={{ width: "100%", marginBottom: "10px" }}

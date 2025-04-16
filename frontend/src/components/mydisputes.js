@@ -4,7 +4,7 @@ import axios from "axios";
 
 function MyDisputesPage() {
     const [disputes, setDisputes] = useState([]);
-    const [moderatorMessages, setModeratorMessages] = useState([]);
+    const [adminMessages, setAdminMessages] = useState([]);
     const [eventTitles, setEventTitles] = useState({});
 
     useEffect(() => {
@@ -16,13 +16,13 @@ function MyDisputesPage() {
             })
             .catch(err => console.error("Failed to fetch disputes", err));
 
-        axios.get("http://127.0.0.1:5000/api/moderator_requests", { withCredentials: true })
+        axios.get("http://127.0.0.1:5000/api/admin_requests", { withCredentials: true })
             .then(response => {
-                setModeratorMessages(response.data);
+                setAdminMessages(response.data);
                 const messageEventIds = [...new Set(response.data.map(m => m.event_id))];
                 fetchEventTitles(messageEventIds);
             })
-            .catch(err => console.error("Failed to fetch moderator messages", err));
+            .catch(err => console.error("Failed to fetch administrator messages", err));
     }, []);
 
     const fetchEventTitles = async (eventIds) => {
@@ -38,7 +38,7 @@ function MyDisputesPage() {
         setEventTitles(prev => ({ ...prev, ...titles }));
     };
 
-    const groupedMessages = moderatorMessages.reduce((acc, msg) => {
+    const groupedMessages = adminMessages.reduce((acc, msg) => {
         if (!acc[msg.event_id]) acc[msg.event_id] = [];
         acc[msg.event_id].push(msg);
         return acc;
@@ -46,9 +46,9 @@ function MyDisputesPage() {
 
     return (
         <div className="admin-dashboard">
-            <h2>Messages from Moderator</h2>
-            {moderatorMessages.length === 0 ? (
-                <p>No messages from moderators.</p>
+            <h2>Messages from Administrator</h2>
+            {adminMessages.length === 0 ? (
+                <p>No messages from admins.</p>
             ) : (
                 <ul>
                     {Object.entries(groupedMessages).map(([eventId, messages]) => (
@@ -74,7 +74,7 @@ function MyDisputesPage() {
                             <tr>
                                 <th>Dispute ID</th>
                                 <th>Event</th>
-                                <th>Moderator</th>
+                                <th>Administrator</th>
                                 <th>Summary</th>
                                 <th>Status</th>
                                 <th>Resolution</th>
@@ -85,7 +85,7 @@ function MyDisputesPage() {
                                 <tr key={dispute.dispute_id}>
                                     <td>{dispute.dispute_id}</td>
                                     <td>{eventTitles[dispute.event_id] || dispute.event_id}</td>
-                                    <td>{dispute.moderator_id}</td>
+                                    <td>{dispute.admin_id}</td>
                                     <td>{dispute.dispute_summary}</td>
                                     <td>{dispute.dispute_status}</td>
                                     <td>{dispute.dispute_resolution || "—"}</td>

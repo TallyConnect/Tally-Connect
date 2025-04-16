@@ -5,7 +5,7 @@ disputes_bp = Blueprint('disputes', __name__, url_prefix='/api')
 
 @disputes_bp.route('/disputes', methods=['GET'])
 def get_disputes():
-    if "user" not in session or session["user"]["role"].lower() not in ["moderator", "event analyst and moderator"]:
+    if "user" not in session or session["user"]["role"].lower() not in ["administrator", "event analyst and administrator"]:
         return jsonify({"error": "Unauthorized"}), 403
 
     db = get_db_connection()
@@ -21,7 +21,7 @@ def get_disputes():
 
 @disputes_bp.route('/disputes/<int:dispute_id>/resolve', methods=['POST'])
 def resolve_dispute(dispute_id):
-    if "user" not in session or session["user"]["role"].lower() not in ["moderator", "event analyst and moderator"]:
+    if "user" not in session or session["user"]["role"].lower() not in ["administrator", "event analyst and administrator"]:
         return jsonify({"error": "Unauthorized"}), 403
 
     data = request.get_json()
@@ -73,18 +73,18 @@ def submit_dispute():
     data = request.json
     raised_by = session["user"]["user_name"]
     event_id = data.get("event_id")
-    moderator_id = data.get("moderator_id")
+    admin_id = data.get("admin_id")
     summary = data.get("dispute_summary")
 
-    if not all([event_id, moderator_id, summary]):
+    if not all([event_id, admin_id, summary]):
         return jsonify({"error": "Missing fields"}), 400
 
     db = get_db_connection()
     cursor = db.cursor()
     cursor.execute("""
-        INSERT INTO disputes (raised_by, event_id, moderator_id, dispute_summary, dispute_status)
+        INSERT INTO disputes (raised_by, event_id, admin_id, dispute_summary, dispute_status)
         VALUES (%s, %s, %s, %s, 'PENDING')
-    """, (raised_by, event_id, moderator_id, summary))
+    """, (raised_by, event_id, admin_id, summary))
     db.commit()
     db.close()
     return jsonify({"message": "Dispute submitted successfully"}), 201
@@ -113,8 +113,8 @@ def get_user_dispute_events():
     db.close()
     return jsonify(events), 200
 
-@disputes_bp.route('/moderator_requests', methods=['GET'])
-def get_moderator_requests():
+@disputes_bp.route('/admin_requests', methods=['GET'])
+def get_admin_requests():
     if "user" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -124,7 +124,7 @@ def get_moderator_requests():
     cursor = db.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT * FROM moderator_requests
+        SELECT * FROM admin_requests
         WHERE organizer_id = %s
         ORDER BY created_at DESC
     """, (organizer_id,))
@@ -133,3 +133,31 @@ def get_moderator_requests():
     db.close()
 
     return jsonify(messages), 200
+
+@disputes_bp.route('/admin_request', methods=['POST'])
+def send_admin_request():
+    if "user" not in session or session["user"]["role"].lower() != "administrator":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    data = request.json
+    dispute_id = data.get("dispute_id")
+    event_id = data.get("event_id")
+    organizer_id = data.get("organizer_id")
+    request_message = data.get("request_message")
+
+    if not all([dispute_id, event_id, organizer_id, request_message]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    admin_id = session["user"]["user_name"]
+
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute("""
+        INSERT INTO admin_requests (dispute_id, event_id, admin_id, organizer_id, request_message)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (dispute_id, event_id, admin_id, organizer_id, request_message))
+
+    db.commit()
+    db.close()
+
+    return jsonify({"message": "Message sent to organizer successfully."}), 200

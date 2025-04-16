@@ -78,7 +78,6 @@ function Layout() {
             { name: "Home", path: "/home", icon: "fa-home" },
             { name: "Profile", path: "/profile", icon: "fa-user" },
             { name: "Events Listings", path: "/moderator/events", icon: "fa-calendar-check" },
-            { name: "Disputes", path: "/disputes", icon: "fa-exclamation-circle" },
             { name: "Engagement", path: "/engagement", icon: "fa-handshake" }
         ]
     };
