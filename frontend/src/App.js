@@ -16,6 +16,7 @@ import Feedback from "./components/feedback"; // ✅ Import the feedback page
 import Disputes from "./components/disputes";
 import SubmitDisputePage from "./components/submitdisputes"; // <-- User/Organizer submit
 import MyDisputesPage from "./components/mydisputes";       // <-- Optional user view
+import Analytics from "./components/analytics";       // <-- Optional user view
 
 function App() {
     return (
@@ -35,7 +36,8 @@ function App() {
                     <Route path="/disputes" element={<Disputes />} />
                     <Route path="/submit-dispute" element={<SubmitDisputePage />} />
                     <Route path="/my-disputes" element={<MyDisputesPage />} />
-                    
+                    <Route path="/analytics" element={<Analytics />} />
+
                 </Route>
 
                 <Route path="/" element={<Login />} /> 

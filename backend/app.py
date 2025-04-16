@@ -10,6 +10,7 @@ from routes.logout import logout_bp
 from routes.moderation import moderation_bp
 from routes.feedback import feedback_bp
 from routes.disputes import disputes_bp
+from routes.analytics import analytics_bp
 
 
 app = Flask(__name__)
@@ -31,6 +32,7 @@ app.register_blueprint(logout_bp, url_prefix='/api')
 app.register_blueprint(moderation_bp, url_prefix='/api')
 app.register_blueprint(feedback_bp, url_prefix='/api')  
 app.register_blueprint(disputes_bp, url_prefix="/api")
+app.register_blueprint(analytics_bp, url_prefix="/api")
 
 if __name__ == '__main__':
     print("Starting Flask App...")  # ✅ Debugging output

@@ -60,7 +60,7 @@ function Layout() {
             { name: "Profile", path: "/profile", icon: "fa-user" },
             { name: "Users", path: "/admin", icon: "fa-users" },
             { name: "Events Listings", path: "/events", icon: "fa-calendar-check" },
-            { name: "Analytics", path: "/analysis", icon: "fa-chart-bar" },
+            { name: "Analytics & Engagement", path: "/analytics", icon: "fa-chart-bar" },
             { name: "Disputes", path: "/disputes", icon: "fa-exclamation-circle" },
             { name: "Warnings", path: "/warnings", icon: "fa-exclamation-circle" }
 
@@ -78,7 +78,7 @@ function Layout() {
             { name: "Home", path: "/home", icon: "fa-home" },
             { name: "Profile", path: "/profile", icon: "fa-user" },
             { name: "Events Listings", path: "/moderator/events", icon: "fa-calendar-check" },
-            { name: "Engagement", path: "/engagement", icon: "fa-handshake" }
+            { name: "Analytics & Engagement", path: "/analytics", icon: "fa-chart-bar" },
         ]
     };
 
