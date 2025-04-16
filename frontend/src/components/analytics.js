@@ -27,20 +27,12 @@ function Analytics() {
                     <p><strong>Average Rating Across Events:</strong> {org.avg_rating_overall ? org.avg_rating_overall.toFixed(2) : "—"}</p>
 
                     <h4>Events</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Event Title</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {org.events.map((event, idx) => (
-                                <tr key={idx}>
-                                    <td>{event.event_title}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+<ul>
+  {org.events.map((event, idx) => (
+    <li key={idx}>{event.event_title}</li>
+  ))}
+</ul>
+
 
                     {/* Feedback Section */}
                     <h4 style={{ marginTop: "20px" }}>Feedback</h4>
