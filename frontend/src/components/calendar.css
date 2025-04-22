@@ -146,6 +146,7 @@ body {
   font-weight: bold;
 }
 
+/* Calendar Task */
 .calendar__task {
   font-size: 0.85rem;
   background-color: #fff8e1;
@@ -154,6 +155,32 @@ body {
   color: #b3942d;
   font-weight: 500;
   margin-bottom: 0.3rem;
+  width: 100%; /* Ensure full width */
+  box-sizing: border-box; /* Prevent any overlap */
+  display: flex;
+  flex-direction: column; /* Stack alerts/events vertically */
+  gap: 0.3rem; /* Space out each event */
+}
+
+/* Add space between events that share the same day */
+.calendar__task--today {
+  margin-bottom: 0.3rem;
+  padding: 5px 10px;
+}
+
+/* Adjust the layout when there are multiple events on the same day */
+.calendar__day {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  align-items: flex-start;
+  padding: 0.5rem;
+}
+
+.calendar__day .calendar__task {
+  margin-bottom: 0.3rem;
+  padding: 0.5rem 0.8rem; /* Add padding */
 }
 
 /* Responsive */
@@ -226,4 +253,14 @@ body {
 
 .event-popup-content button:hover {
     background-color: #6e49ad;
+}
+
+.alert-icon {
+    cursor: pointer;
+    color: #ff9800;
+    font-size: 1.2rem;
+    margin-left: 5px;
+}
+.alert-icon:hover {
+    color: #e65100;
 }

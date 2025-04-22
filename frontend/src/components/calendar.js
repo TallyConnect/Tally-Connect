@@ -8,6 +8,7 @@ function Calendar() {
     const [message, setMessage] = useState('');
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [alertPopup, setAlertPopup] = useState(null);
 
     const today = new Date();
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -100,14 +101,27 @@ function Calendar() {
                 <div 
                     key={i} 
                     className={`calendar__day ${isToday ? 'today' : ''}`}
-                    onClick={() => handleDayClick(i)}
                 >
                     <span className="calendar__date">{i}</span>
                     <div className="calendar__task">
                         {dayEvents.map(event => (
-                            <div key={event.event_id} className="calendar__task--today">
+                            <div 
+                                key={event.event_id}
+                                className="calendar__task--today"
+                                onClick={() => handleEventClick(event)} // Make each event clickable
+                            >
                                 <p className="font-semibold">{event.event_title}</p>
-                                <p className="text-sm text-gray-600">{formatTime(event.datetime)}</p>
+                                {event.alerts && event.alerts.length > 0 && (
+                                    <span 
+                                        className="alert-icon"
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent click from propagating to the event
+                                            handleAlertClick(event.alerts);
+                                        }}
+                                    >
+                                        🔔
+                                    </span>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -116,6 +130,11 @@ function Calendar() {
         }
 
         return calendarDays;
+    };
+
+    const handleEventClick = (event) => {
+        // Set the selected event for the popup to show its details
+        setSelectedEvent(event);
     };
 
     const handleDayClick = (day) => {
@@ -161,6 +180,14 @@ function Calendar() {
         });
     };
 
+    const handleAlertClick = (alerts) => {
+        setAlertPopup(alerts);
+    };
+
+    const closeAlertPopup = () => {
+        setAlertPopup(null);
+    };
+
     return (
         <div className="calendar-contain">
             <div className="calendar__title-bar">
@@ -182,8 +209,12 @@ function Calendar() {
                                     const eventDate = new Date(event.datetime);
                                     const isValidDate = !isNaN(eventDate);
                                     return (
-                                        <li key={event.event_id} className="sidebar__list-item">
-                                            <span>{event.event_title}</span>
+                                        <li key={event.event_id || event.alert_id}
+                                            className={`sidebar__list-item ${event.type === "alert" ? "alert" : ""}`}>
+                                            <span>
+                                                {event.type === "alert" ? "🔔 " : ""}
+                                                {event.type === "alert" ? event.alert_title : event.event_title}
+                                            </span>
                                             <span className="list-item__time">
                                                 {isValidDate ? eventDate.toLocaleDateString() : "Invalid Date"}
                                             </span>
@@ -218,7 +249,9 @@ function Calendar() {
             {selectedEvent && (
                 <div className="event-popup">
                     <div className="event-popup-content">
-                        <h3>{selectedEvent.event_title}</h3>
+                        <h3>
+                            {selectedEvent.type === "alert" ? selectedEvent.alert_title : selectedEvent.event_title}
+                        </h3>
                         <p>{selectedEvent.event_description}</p>
                         <p><strong>Location:</strong> {selectedEvent.event_location}</p>
                         {selectedEvent.datetime && (
@@ -251,6 +284,21 @@ function Calendar() {
                         )}
                         <button onClick={closeEventDetails}>Close</button>
                     </div>
+                </div>
+            )}
+
+            {alertPopup && (
+                <div className="popup">
+                    <h3>Alerts</h3>
+                    <ul>
+                        {alertPopup.map(alert => (
+                            <li key={alert.alert_id}>
+                                <p><strong>{alert.alert_title}</strong></p>
+                                <p>{alert.alert_description}</p>
+                            </li>
+                        ))}
+                    </ul>
+                    <button onClick={closeAlertPopup} className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">Close</button>
                 </div>
             )}
 

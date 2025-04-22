@@ -18,6 +18,16 @@ function Events() {
     });
     const [selectedEvent, setSelectedEvent] = useState(null);
 
+    /* ------------------------------------------------------------- */
+    /* Alert‑posting state – visible only to organizers               */
+    /* ------------------------------------------------------------- */
+    const [showAlertPopup, setShowAlertPopup] = useState(false);
+    const [alertData, setAlertData] = useState({
+        alert_title: "",
+        alert_description: "",
+        alert_datetime: ""
+    });
+
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
             .then(response => setUser(response.data))
@@ -27,11 +37,11 @@ function Events() {
     useEffect(() => {
         if (user) {
             axios.get(`http://127.0.0.1:5000/api/events?role=${user.role}&username=${user.user_name}`)
-            .then(response => {
-                console.log("Fetched events:", response.data); // Log fetched events
-                setEvents(response.data);
-            })
-            .catch(error => console.error("Error fetching events:", error));
+                .then(response => {
+                    console.log("Fetched events:", response.data); // Log fetched events
+                    setEvents(response.data);
+                })
+                .catch(error => console.error("Error fetching events:", error));
         }
     }, [user]);
 
@@ -41,6 +51,33 @@ function Events() {
             ...prevData,
             [name]: value
         }));
+    };
+
+    /* ------------ handlers for alert form ------------------------ */
+    const handleAlertChange = (e) => {
+        const { name, value } = e.target;
+        setAlertData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handlePostAlert = () => {
+        if (!selectedEvent) return;
+        if (!alertData.alert_title || !alertData.alert_datetime) {
+            alert("Title & date/time are required");
+            return;
+        }
+        axios.post("http://127.0.0.1:5000/api/post_alert", {
+            event_id: selectedEvent.event_id,
+            ...alertData
+        }, { withCredentials: true })
+        .then(res => {
+            setMessage(res.data.message);
+            setShowAlertPopup(false);
+            setAlertData({ alert_title:"", alert_description:"", alert_datetime:"" });
+        })
+        .catch(err => {
+            console.error("Alert post failed:", err);
+            setMessage("Failed to post alert");
+        });
     };
 
     const handleFileChange = (e) => setEventData({ ...eventData, selectedFile: e.target.files[0] });
@@ -137,8 +174,8 @@ function Events() {
     return (
         <div className="p-4">
             <style>
-                {`
-                .grid-container {
+                {
+                `.grid-container {
                     display: grid;
                     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
                     gap: 20px;
@@ -181,8 +218,8 @@ function Events() {
                 }
                 .popup img {
                     margin-top:10px;
+                }`
                 }
-                `}
             </style>
 
             <h2 className="text-2xl font-bold mb-4">Upcoming Events</h2>
@@ -197,6 +234,20 @@ function Events() {
                             className="flyer-image" 
                         />
                         <h3 className="event-title">{event.event_title}</h3>
+                        {/* Display alerts for the event */}
+                        {event.alerts && event.alerts.length > 0 && (
+                            <div className="alerts">
+                                <h4 className="text-lg font-bold">Alerts:</h4>
+                                <ul>
+                                    {event.alerts.map((alert, index) => (
+                                        <li key={index}>
+                                            <strong>{alert.alert_title}</strong> - {alert.alert_datetime}
+                                            <p>{alert.alert_description}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
@@ -264,12 +315,20 @@ function Events() {
                     <p><strong>Location:</strong> {selectedEvent.event_location}</p>
                     <p><strong>Date & Time:</strong> {new Date(`${selectedEvent.event_date}T${selectedEvent.event_time}Z`).toLocaleString()}</p>
                     {user.role.toLowerCase() === "organizer" && user.user_name === selectedEvent.user_name ? (
-                        <button
-                            onClick={() => handleDeleteEvent(selectedEvent.event_id)}
-                            className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md"
-                        >
-                            Delete Event
-                        </button>
+                        <>
+                            <button
+                                onClick={() => setShowAlertPopup(true)}
+                                className="bg-indigo-500 text-white px-4 py-2 mt-2 rounded-md"
+                            >
+                                Post Alert
+                            </button>
+                            <button
+                                onClick={() => handleDeleteEvent(selectedEvent.event_id)}
+                                className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md"
+                            >
+                                Delete Event
+                            </button>
+                        </>
                     ) : null}
                     <button onClick={() => setShowEventDetailsPopup(false)} className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">Close</button>
                     {user.role.toLowerCase() === 'organizer' && user.user_name === selectedEvent.user_name && (
@@ -285,6 +344,40 @@ function Events() {
                             });
                         }} className="bg-yellow-500 text-white px-4 py-2 mt-2 rounded-md">Edit</button>
                     )}
+                </div>
+            )}
+
+            {/* -------------------- Alert popup --------------------- */}
+            {showAlertPopup && (
+                <div className="popup">
+                    <h3>Post Alert for: {selectedEvent?.event_title}</h3>
+                    <input
+                        type="text"
+                        name="alert_title"
+                        placeholder="Alert Title"
+                        value={alertData.alert_title}
+                        onChange={handleAlertChange}
+                    />
+                    <textarea
+                        name="alert_description"
+                        placeholder="Description (optional)"
+                        value={alertData.alert_description}
+                        onChange={handleAlertChange}
+                    />
+                    <input
+                        type="datetime-local"
+                        name="alert_datetime"
+                        value={alertData.alert_datetime}
+                        onChange={handleAlertChange}
+                    />
+                    <button onClick={handlePostAlert}
+                            className="bg-blue-500 text-white px-4 py-2 mt-2 rounded-md">
+                        Submit
+                    </button>
+                    <button onClick={() => setShowAlertPopup(false)}
+                            className="bg-gray-500 text-white px-4 py-2 mt-2 rounded-md">
+                        Cancel
+                    </button>
                 </div>
             )}
 
