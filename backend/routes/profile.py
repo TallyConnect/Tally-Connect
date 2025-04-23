@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, session, request
+from flask_cors import cross_origin  # ✅ Import cross_origin
 from config.db_config import get_db_connection
 import os
 import uuid
 from datetime import datetime, timedelta
 
-profile_bp = Blueprint('profile', __name__,url_prefix='/api')
+profile_bp = Blueprint('profile', __name__)
 
 @profile_bp.route('/profile', methods=['GET'])
 def user_profile():
@@ -17,6 +18,7 @@ def user_profile():
     return jsonify(session["user"])  # ✅ Return logged-in user details
 
 @profile_bp.route('/profile/update', methods=['POST'])
+@cross_origin(origins=["http://localhost:3000", "http://127.0.0.1:3000"], supports_credentials=True)  # ✅ Apply cross_origin
 def update_profile():
     if "user" not in session:
         return jsonify({"error": "Unauthorized"}), 401
@@ -32,14 +34,23 @@ def update_profile():
     db = get_db_connection()
     cursor = db.cursor()
 
-    cursor.execute("""
-        UPDATE users 
-        SET user_email = %s,
-            user_password = %s,
-            user_contact_details = %s,
-            user_preferences = %s
-        WHERE user_name = %s
+    if new_password:
+        cursor.execute("""
+            UPDATE users  SET
+                user_email = %s,
+                user_password = %s,
+                user_contact_details = %s,
+                user_preferences = %s
+            WHERE user_name = %s
     """, (new_email, new_password, new_contact, new_preferences, username))
+    else:
+        cursor.execute("""
+            UPDATE users SET
+                user_email = %s,
+                user_contact_details = %s,
+                user_preferences = %s
+            WHERE user_name = %s
+    """, (new_email, new_contact, new_preferences, username))
     
     db.commit()
     db.close()
