@@ -5,6 +5,7 @@ import os
 import uuid
 from datetime import datetime, timedelta, date
 import pytz
+import json
 
 events_bp = Blueprint('events', __name__, url_prefix='/api')
 
@@ -41,26 +42,42 @@ def serialize_event(event):
 def upload_flyer():
     print("Upload Folder Path:", os.path.abspath(UPLOAD_FOLDER))
 
+    # Check if the file is present
     if 'file' not in request.files:
         return jsonify({"message": "No file part"}), 400
 
     file = request.files['file']
-    print(f"Received File: {file.filename}")
+    print(f"Received File: {file.filename if file else 'No file'}")
     print("Received Form Data:", request.form)
 
+    # Extract form data
     user_name = request.form.get("user_name")
     event_title = request.form.get("event_title")
     event_description = request.form.get("event_description")
     event_location = request.form.get("event_location")
-    event_date = datetime.strptime(request.form.get("event_date"), "%Y-%m-%d").date()
-    event_time = request.form.get("event_time")
+    try:
+        event_date = datetime.strptime(request.form.get("event_date"), "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"error": "Invalid event_date format"}), 400
 
-    if not file or not event_title or not event_location or not event_date or not event_time or not event_description:
+    event_time = request.form.get("event_time")
+    category_id = request.form.get("category_id")  # This will be a JSON string
+
+    # Validate required fields
+    if not file or not user_name or not event_title or not event_description or not event_location or not event_date or not event_time or not category_id:
         return jsonify({"error": "Missing required fields"}), 400
 
+    # Validate file type
     if not allowed_file(file.filename):
         return jsonify({"error": "Invalid file type"}), 400
 
+    # Parse category_id
+    try:
+        category_ids = json.loads(category_id)  # Parse it into a Python list
+    except json.JSONDecodeError:
+        return jsonify({"error": "Invalid category_id format"}), 400
+
+    # Save the file
     event_id = str(uuid.uuid4())[:8]
     filename = f"{event_id}_{secure_filename(file.filename)}"
     flyer_path = os.path.join(UPLOAD_FOLDER, filename)
@@ -71,30 +88,28 @@ def upload_flyer():
         db = get_db_connection()
         cursor = db.cursor()
 
-        tz = pytz.timezone('UTC')  # Use UTC to avoid mismatches
-        event_datetime = datetime.combine(event_date, datetime.min.time())
-        event_datetime = tz.localize(event_datetime)
-        cursor.callproc("insert_event", (
-            user_name,
-            event_title,
-            event_description,
-            event_location,
-            event_date,
-            event_time,
-            'Draft',
-            flyer_url,
-            'Pending'
-        ))
-        db.commit()
-        db.close()
-    except Exception as e:
-        print("Error inserting event via stored procedure:", e)
-        return jsonify({"error": "Database error"}), 500
+        # Insert the event into the database
+        cursor.execute("""
+            INSERT INTO events (event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status, flyer_url, moderator_approval)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (event_id, user_name, event_title, event_description, event_location, event_date, event_time, 'Draft', flyer_url, 'Pending'))
 
-    return jsonify({
-        "message": "Flyer uploaded and event created!",
-        "flyer_url": flyer_url
-    })
+        # Insert category IDs into the event_tags table
+        for cat_id in category_ids:
+            cursor.execute("""
+                INSERT INTO event_tags (event_id, tag_id)
+                VALUES (%s, %s)
+            """, (event_id, cat_id))
+
+        db.commit()
+        cursor.close()
+        db.close()
+
+        return jsonify({"message": "Flyer uploaded and event created!", "event_id": event_id, "flyer_url": flyer_url}), 200
+
+    except Exception as e:
+        print("Error in /upload_flyer:", e)
+        return jsonify({"error": "Internal server error"}), 500
 
 @events_bp.route('/events', methods=['GET'])
 def get_events():
@@ -252,3 +267,25 @@ def user_calendar():
         event["datetime"] = f"{event['event_date']}T{event['event_time']}:00+00:00"
 
     return jsonify(events), 200
+
+@events_bp.route("/api/assign_tags", methods=["POST"])
+def assign_tags():
+    data = request.get_json()
+    event_id = data["event_id"]
+    tag_ids = data["tag_ids"]
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+
+        for tag_id in tag_ids:
+            cursor.execute("INSERT INTO event_tags (event_id, tag_id) VALUES (%s, %s)", (event_id, tag_id))
+        
+        db.commit()
+        cursor.close()
+        db.close()
+
+        return jsonify({"message": "Tags assigned successfully"}), 200
+    except Exception as e:
+        print("Error assigning tags:", e)
+        return jsonify({"error": "Failed to assign tags"}), 500

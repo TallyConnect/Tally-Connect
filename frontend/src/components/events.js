@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
 function Events() {
@@ -14,7 +14,8 @@ function Events() {
         event_location: "",
         event_time: "",
         event_description: "",
-        selectedFile: null
+        selectedFile: null,
+        category_id: ""
     });
     const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -27,6 +28,12 @@ function Events() {
         alert_description: "",
         alert_datetime: ""
     });
+
+    // Add new state for tags
+    const [availableTags, setAvailableTags] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [showTagsDropdown, setShowTagsDropdown] = useState(false);
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
         axios.get("http://127.0.0.1:5000/api/profile", { withCredentials: true })
@@ -45,8 +52,34 @@ function Events() {
         }
     }, [user]);
 
+    // Fetch available tags on component mount
+    useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const response = await axios.get("http://127.0.0.1:5000/api/categories");
+                const tags = response.data.categories;
+                console.log("Available Tags:", tags); // Log the fetched tags
+                setAvailableTags(tags); // Update availableTags
+                setSelectedTags(tags.map(tag => tag.id)); // Initialize selectedTags with tag IDs
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+
+        fetchTags();
+    }, []);
+
+    useEffect(() => {
+        console.log("Available Tags State:", availableTags);  // Log the state to verify data
+    }, [availableTags]);
+
+    useEffect(() => {
+        console.log("Selected Tags State:", selectedTags); // Log the updated state
+    }, [selectedTags]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
+        console.log(`Updating ${name}:`, value); // Log the field being updated
         setEventData(prevData => ({
             ...prevData,
             [name]: value
@@ -80,13 +113,26 @@ function Events() {
         });
     };
 
-    const handleFileChange = (e) => setEventData({ ...eventData, selectedFile: e.target.files[0] });
+    const handleFileChange = (e) => {
+        console.log("Selected File:", e.target.files[0]); // Log the selected file
+        setEventData(prevData => ({
+            ...prevData,
+            selectedFile: e.target.files[0]
+        }));
+    };
 
     const handleUpload = async () => {
-        console.log(eventData); // Log event data before validation
+        console.log("Event Data Before Validation:", eventData); // Log event data before validation
 
-        if (!eventData.selectedFile || !eventData.event_title || !eventData.event_date || !eventData.event_location) {
+        if (!eventData.selectedFile || !eventData.event_title || !eventData.event_date || !eventData.event_location || eventData.category_id.length === 0) {
             alert("Please fill in all fields and upload a flyer.");
+            return;
+        }
+
+        const allowedExtensions = ["png", "jpg", "jpeg", "gif"];
+        const fileExtension = eventData.selectedFile?.name.split(".").pop().toLowerCase();
+        if (!allowedExtensions.includes(fileExtension)) {
+            alert("Invalid file type. Please upload a valid image.");
             return;
         }
 
@@ -98,6 +144,12 @@ function Events() {
         formData.append("event_location", eventData.event_location);
         formData.append("event_date", eventData.event_date);
         formData.append("event_time", eventData.event_time);
+        formData.append("category_id", JSON.stringify(eventData.category_id)); // Send category_id as JSON string
+
+        console.log("FormData being sent:");
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
 
         try {
             const response = await axios.post("http://127.0.0.1:5000/api/upload_flyer", formData, {
@@ -285,11 +337,11 @@ function Events() {
                     />
                     <input
                         type="time"
-                        name="event_time" 
+                        name="event_time"
                         onChange={handleChange}
                     />
                     <textarea
-                        name="event_description"  
+                        name="event_description"
                         placeholder="Event Description"
                         onChange={handleChange}
                     />
@@ -298,6 +350,58 @@ function Events() {
                         onChange={handleFileChange}
                         accept=".png,.jpg,.jpeg,.gif"
                     />
+
+                    {/* Custom checkbox-based dropdown for category selection */}
+                    <div className="mt-4 relative" ref={dropdownRef}>
+                        <div
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-md cursor-pointer bg-white relative ${
+                                selectedTags.length === 0 ? "text-gray-400" : "text-black"
+                            }`}
+                            onClick={() => setShowTagsDropdown(prev => !prev)}
+                        >
+                            {selectedTags.length === 0 ? (
+                                <span className="absolute top-2 left-3 text-sm pointer-events-none text-gray-400">
+                                    Select Categories...
+                                </span>
+                            ) : (
+                                availableTags
+                                    .filter(tag => selectedTags.includes(tag.id))
+                                    .map(tag => tag.name)
+                                    .join(", ")
+                            )}
+                        </div>
+
+                        {showTagsDropdown && (
+                            <div className="absolute mt-1 z-20 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-40 overflow-y-auto">
+                                {availableTags.length > 0 ? (
+                                    availableTags.map(tag => (
+                                        <label key={tag.id} className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedTags.includes(tag.id)}
+                                                onChange={(e) => {
+                                                    const updatedTags = e.target.checked
+                                                        ? [...selectedTags, tag.id]
+                                                        : selectedTags.filter(id => id !== tag.id);
+
+                                                    setSelectedTags(updatedTags); // Update selectedTags state
+                                                    setEventData(prevData => ({
+                                                        ...prevData,
+                                                        category_id: updatedTags // Update category_id with all selected IDs
+                                                    }));
+                                                }}
+                                                className="mr-2"
+                                            />
+                                            {tag.name}
+                                        </label>
+                                    ))
+                                ) : (
+                                    <div className="p-2 text-gray-500">Loading categories...</div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                     <button onClick={handleUpload} className="bg-blue-500 text-white px-4 py-2 mt-2 rounded-md">Submit</button>
                     <button onClick={() => setShowUploadPopup(false)} className="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">Cancel</button>
                 </div>
@@ -340,7 +444,8 @@ function Events() {
                                 event_location: selectedEvent.event_location,
                                 event_date: selectedEvent.event_date,
                                 event_time: selectedEvent.event_time,
-                                selectedFile: null
+                                selectedFile: null,
+                                category_id: selectedEvent.category_id
                             });
                         }} className="bg-yellow-500 text-white px-4 py-2 mt-2 rounded-md">Edit</button>
                     )}
