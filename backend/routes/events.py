@@ -35,6 +35,12 @@ def serialize_event(event):
     if 'event_date' in event and 'event_time' in event:
         event['datetime'] = f"{event['event_date']}T{event['event_time']}:00+00:00"
 
+    # Convert category string to list
+    if 'categories' in event and event['categories']:
+        event['categories'] = [cat.strip() for cat in event['categories'].split(',')]
+    else:
+        event['categories'] = []
+
     print("Serialized Event Data:", event)
     return event
 
@@ -120,9 +126,25 @@ def get_events():
     cursor = db.cursor(dictionary=True)
 
     if role == 'organizer':
-        cursor.execute("SELECT event_id, event_title, flyer_url, event_location, event_date, event_time, event_description FROM events WHERE user_name = %s", (username,))
+        cursor.execute("""
+            SELECT e.event_id, e.event_title, e.flyer_url, e.event_location, e.event_date, e.event_time, 
+                   e.event_description, GROUP_CONCAT(c.category_name) AS categories
+            FROM events e
+            LEFT JOIN event_tags t ON e.event_id = t.event_id
+            LEFT JOIN event_categories c ON t.tag_id = c.category_id
+            WHERE e.user_name = %s
+            GROUP BY e.event_id
+        """, (username,))
     else:
-        cursor.execute("SELECT event_id, event_title, flyer_url, event_location, event_date, event_time, event_description FROM events WHERE event_status = 'Scheduled' AND moderator_approval = 'Approved'")
+        cursor.execute("""
+            SELECT e.event_id, e.event_title, e.flyer_url, e.event_location, e.event_date, e.event_time, 
+                   e.event_description, GROUP_CONCAT(c.category_name) AS categories
+            FROM events e
+            LEFT JOIN event_tags t ON e.event_id = t.event_id
+            LEFT JOIN event_categories c ON t.tag_id = c.category_id
+            WHERE e.event_status = 'Scheduled' AND e.moderator_approval = 'Approved'
+            GROUP BY e.event_id
+        """)
 
     events = cursor.fetchall()
     db.close()

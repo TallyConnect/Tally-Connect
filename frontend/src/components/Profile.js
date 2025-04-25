@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from "react"; // Added useRef
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./admin.css"; // Reuse the existing admin dashboard styles
+import "./admin.css";
 
 function PreferenceDropdown({ categories, selectedPrefs, onChange }) {
     const dropdownRef = useRef(null);
@@ -16,7 +16,6 @@ function PreferenceDropdown({ categories, selectedPrefs, onChange }) {
         onChange(updated.join(", "));
     };
 
-    // Close dropdown on outside click
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -29,11 +28,11 @@ function PreferenceDropdown({ categories, selectedPrefs, onChange }) {
 
     return (
         <div ref={dropdownRef} style={{ position: "relative", width: "200px" }}>
-            <div 
-                onClick={toggleDropdown} 
+            <div
+                onClick={toggleDropdown}
                 style={{
-                    border: "1px solid #ccc", 
-                    padding: "8px", 
+                    border: "1px solid #ccc",
+                    padding: "8px",
                     cursor: "pointer",
                     background: "#f9f9f9"
                 }}
@@ -42,14 +41,14 @@ function PreferenceDropdown({ categories, selectedPrefs, onChange }) {
             </div>
 
             {isOpen && (
-                <div 
+                <div
                     style={{
-                        position: "absolute", 
-                        zIndex: 1, 
-                        backgroundColor: "white", 
-                        border: "1px solid #ccc", 
-                        maxHeight: "150px", 
-                        overflowY: "auto", 
+                        position: "absolute",
+                        zIndex: 1,
+                        backgroundColor: "white",
+                        border: "1px solid #ccc",
+                        maxHeight: "150px",
+                        overflowY: "auto",
                         width: "100%"
                     }}
                 >
@@ -58,10 +57,10 @@ function PreferenceDropdown({ categories, selectedPrefs, onChange }) {
                             <label key={idx} style={{ display: "block", padding: "5px" }}>
                                 <input
                                     type="checkbox"
-                                    checked={selectedPrefs.includes(cat)}
-                                    onChange={() => handleCheckboxChange(cat)}
+                                    checked={selectedPrefs.includes(cat.name)}
+                                    onChange={() => handleCheckboxChange(cat.name)}
                                 />
-                                {" "}{cat}
+                                {cat.name}
                             </label>
                         ))
                     ) : (
@@ -83,7 +82,7 @@ function Profile() {
         user_contact_details: "",
         user_preferences: ""
     });
-    const [categories, setCategories] = useState([]); 
+    const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -109,13 +108,10 @@ function Profile() {
     };
 
     const handleUpdate = () => {
-        // Use current user password if none entered
         const updatedForm = {
             ...form,
             user_password: form.user_password || user.user_password,
         };
-
-        console.log("Updating with form:", updatedForm);
 
         axios.post("http://127.0.0.1:5000/api/profile/update", updatedForm, { withCredentials: true })
             .then(response => {
@@ -123,7 +119,6 @@ function Profile() {
                 setEditing(false);
             })
             .catch(err => {
-                console.error("Update failed:", err);
                 setError("Update failed.");
             });
     };
@@ -154,13 +149,11 @@ function Profile() {
                     <input name="user_email" value={form.user_email} onChange={handleChange} placeholder="Email" />
                     <input name="user_password" value={form.user_password} onChange={handleChange} placeholder="Password" />
                     <input name="user_contact_details" value={form.user_contact_details} onChange={handleChange} placeholder="Contact Details" />
-
-                    <PreferenceDropdown 
-                        categories={categories} 
-                        selectedPrefs={form.user_preferences.split(',').map(p => p.trim())} 
+                    <PreferenceDropdown
+                        categories={categories}
+                        selectedPrefs={form.user_preferences.split(',').map(p => p.trim())}
                         onChange={(val) => setForm({ ...form, user_preferences: val })}
                     />
-
                     <div style={{ marginTop: "10px" }}>
                         <button onClick={handleUpdate}>Save</button>
                         <button onClick={() => setEditing(false)} style={{ marginLeft: "10px" }}>Cancel</button>

@@ -15,7 +15,7 @@ function Events() {
         event_time: "",
         event_description: "",
         selectedFile: null,
-        category_id: ""
+        category_id: [] // Initialize as an empty array
     });
     const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -124,7 +124,14 @@ function Events() {
     const handleUpload = async () => {
         console.log("Event Data Before Validation:", eventData); // Log event data before validation
 
-        if (!eventData.selectedFile || !eventData.event_title || !eventData.event_date || !eventData.event_location || eventData.category_id.length === 0) {
+        if (
+            !eventData.selectedFile ||
+            !eventData.event_title ||
+            !eventData.event_date ||
+            !eventData.event_location ||
+            !eventData.category_id || // Ensure category_id exists
+            eventData.category_id.length === 0 // Ensure it's not empty
+        ) {
             alert("Please fill in all fields and upload a flyer.");
             return;
         }
@@ -387,7 +394,7 @@ function Events() {
                                                     setSelectedTags(updatedTags); // Update selectedTags state
                                                     setEventData(prevData => ({
                                                         ...prevData,
-                                                        category_id: updatedTags // Update category_id with all selected IDs
+                                                        category_id: updatedTags // Update with the selected tag IDs
                                                     }));
                                                 }}
                                                 className="mr-2"

@@ -14,6 +14,7 @@ from routes.disputes import disputes_bp
 from routes.analytics import analytics_bp
 from routes.event_alerts import event_alerts_bp
 from routes.category import category_bp
+from routes.recommendations import recommendations_bp
  
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Required for session storage
@@ -36,6 +37,7 @@ app.register_blueprint(disputes_bp, url_prefix="/api")
 app.register_blueprint(analytics_bp, url_prefix="/api")
 app.register_blueprint(event_alerts_bp, url_prefix="/api")
 app.register_blueprint(category_bp, url_prefix="/api")
+app.register_blueprint(recommendations_bp, url_prefix="/api")
 
 # ✅ Apply CORS globally after blueprint registration
 CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"], supports_credentials=True)
