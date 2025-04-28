@@ -103,28 +103,26 @@ function Calendar() {
                     className={`calendar__day ${isToday ? 'today' : ''}`}
                 >
                     <span className="calendar__date">{i}</span>
-                    <div className="calendar__task">
-                        {dayEvents.map(event => (
-                            <div 
-                                key={event.event_id}
-                                className="calendar__task--today"
-                                onClick={() => handleEventClick(event)} // Make each event clickable
-                            >
-                                <p className="font-semibold">{event.event_title}</p>
-                                {event.alerts && event.alerts.length > 0 && (
-                                    <span 
-                                        className="alert-icon"
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Prevent click from propagating to the event
-                                            handleAlertClick(event.alerts);
-                                        }}
-                                    >
-                                        🔔
-                                    </span>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                    {dayEvents.map(event => (
+                        <div 
+                            key={event.event_id}
+                            className="calendar__task"
+                            onClick={() => handleEventClick(event)}
+                        >
+                            <p className="font-semibold">{event.event_title}</p>
+                            {event.alerts && event.alerts.length > 0 && (
+                                <span 
+                                    className="alert-icon"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevent click from propagating to the event
+                                        handleAlertClick(event.alerts);
+                                    }}
+                                >
+                                    🔔
+                                </span>
+                            )}
+                        </div>
+                    ))}
                 </div>
             );
         }

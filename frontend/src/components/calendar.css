@@ -157,7 +157,7 @@ body {
   margin-bottom: 0.3rem;
   width: 100%; /* Ensure full width */
   box-sizing: border-box; /* Prevent any overlap */
-  display: flex;
+  display: block;
   flex-direction: column; /* Stack alerts/events vertically */
   gap: 0.3rem; /* Space out each event */
 }
@@ -263,4 +263,11 @@ body {
 }
 .alert-icon:hover {
     color: #e65100;
+}
+
+/* Hover effect for calendar events */
+.calendar__task:hover {
+  background-color: #ffecb3; /* Slightly darker yellow */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
