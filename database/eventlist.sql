@@ -7,6 +7,7 @@ CALL insert_event(
    '12:00:00',
    'Scheduled',
    '2ac927c9_Summer-Party-Flyer-preview.jpg',
+   'Health',
    'Approved'
 );
 
@@ -19,6 +20,7 @@ CALL insert_event(
    '10:00:00',
    'Scheduled',
    '2ac927c9_Summer-Party-Flyer-preview.jpg',
+   'Education',
    'Approved'
 );
 
@@ -31,6 +33,7 @@ CALL insert_event(
    '13:00:00',
    'Scheduled',
    '2ac927c9_Summer-Party-Flyer-preview.jpg',
+   'Health',
    'Approved'
 );
 
@@ -43,6 +46,7 @@ CALL insert_event(
    '09:00:00',
    'Scheduled',
    '2ac927c9_Summer-Party-Flyer-preview.jpg',
+   'Health',
    'Approved'
 );
 
@@ -55,6 +59,7 @@ CALL insert_event(
    '14:00:00',
    'Scheduled',
    '2ac927c9_Summer-Party-Flyer-preview.jpg',
+   'Tech',
    'Approved'
 );
 
@@ -67,5 +72,6 @@ CALL insert_event(
    '19:15:00',
    'Draft',
    '/static/flyers/92679e58_testing_banner.jpg',
+   'Education',
    'Pending'
 );
