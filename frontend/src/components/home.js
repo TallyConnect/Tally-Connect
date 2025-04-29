@@ -140,7 +140,7 @@ function Home() {
                 }
                 `}
             </style>
-
+ 
             {/* Search Bar */}
             <div className="mb-4">
                 <input

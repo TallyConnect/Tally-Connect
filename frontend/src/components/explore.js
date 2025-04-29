@@ -5,7 +5,7 @@ function Explore() {
     const [events, setEvents] = useState([]);
     const [error, setError] = useState("");
     const [user, setUser] = useState(null);
-    const [popupEvent, setPopupEvent] = useState(null); // Store clicked event for popup
+    const [popupEvent, setPopupEvent] = useState(null);
 
     // Fetch logged-in user's profile
     useEffect(() => {
@@ -43,7 +43,7 @@ function Explore() {
         axios.post("http://127.0.0.1:5000/api/signup_event", { event_id: eventId }, { withCredentials: true })
             .then(response => {
                 alert(response.data.message || "Signed up successfully!");
-                setPopupEvent(null); // Close popup after sign-up
+                setPopupEvent(null);
             })
             .catch(error => {
                 console.error("Signup error:", error);
@@ -52,16 +52,46 @@ function Explore() {
     };
 
     const handleEventClick = (event) => {
-        setPopupEvent(event); // Show event details in popup
+        setPopupEvent(event);
     };
 
     const closePopup = () => {
-        setPopupEvent(null); // Close the popup
+        setPopupEvent(null);
     };
 
     return (
-        <div>
-            <h2>Recommended Events</h2>
+        <div className="main w-full p-4">
+            <style>
+                {`
+                .grid-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                    gap: 20px;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                }
+                .grid-item {
+                    background-color: #fff;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                    text-align: center;
+                    transition: transform 0.2s ease-in-out;
+                }
+                .grid-item:hover {
+                    transform: scale(1.05);
+                }
+                .flyer-image {
+                    width: 100%;
+                    height: 300px;
+                    object-fit: cover;
+                    border-bottom: 2px solid #e0e0e0;
+                }
+                `}
+            </style>
+
+            <h2 className="text-2xl font-bold mb-4">Recommended Events</h2>
             {error && <p>{error}</p>}
 
             <div className="grid-container">
@@ -85,7 +115,6 @@ function Explore() {
                 )}
             </div>
 
-            {/* Popup for event details */}
             {popupEvent && (
                 <div style={styles.popupOverlay}>
                     <div style={styles.popupContent}>
@@ -120,14 +149,17 @@ const styles = {
         justifyContent: "center",
         alignItems: "center",
         zIndex: 1000,
+        overflowY: "auto", // Allow scrolling if content overflows
     },
     popupContent: {
         background: "white",
         padding: "20px",
         borderRadius: "8px",
-        maxWidth: "500px",
+        maxWidth: "90%", // Ensure the popup fits within the viewport
+        maxHeight: "90%", // Limit the height to fit within the viewport
         width: "100%",
         textAlign: "center",
+        overflowY: "auto", // Add scrolling for overflowing content
     },
     flyerImage: {
         maxWidth: "100%",
@@ -142,9 +174,9 @@ const styles = {
         border: "none",
         cursor: "pointer",
     },
-    buttonHover: {
-        backgroundColor: "#0056b3",
-    },
 };
 
 export default Explore;
+
+
+
