@@ -11,8 +11,8 @@ CREATE TABLE events (
     event_last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     moderator_approval ENUM('Pending', 'Approved', 'Denied') DEFAULT 'Pending',
     flyer_url VARCHAR(500),
-    category_id INT,
+    category_name VARCHAR(50) NOT NULL,
     PRIMARY KEY (event_id), 
     FOREIGN KEY (user_name) REFERENCES users(user_name) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES event_categories(category_id)
+    FOREIGN KEY (category_name) REFERENCES event_categories(category_name)
 );

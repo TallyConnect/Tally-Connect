@@ -9,6 +9,7 @@ CREATE PROCEDURE insert_event(
     IN event_time TIME,
     IN event_status ENUM('Draft','Scheduled', 'Canceled', 'Completed'),
     IN flyer_url VARCHAR(500),
+    category_name VARCHAR(50),
     moderator_approval ENUM('Pending', 'Approved', 'Denied')
 )
 BEGIN
@@ -24,8 +25,8 @@ BEGIN
     SET new_event_id = CONCAT('E', LPAD(last_id, 4, '0'));
 
     -- Insert the new event
-    INSERT INTO events (event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status, flyer_url, event_created, event_last_updated, moderator_approval)
-    VALUES (new_event_id, user_name, event_title, event_description, event_location, event_date, event_time, 'Draft', flyer_url, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+    INSERT INTO events (event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status, flyer_url, category_name, event_created, event_last_updated, moderator_approval)
+    VALUES (new_event_id, user_name, event_title, event_description, event_location, event_date, event_time, 'Draft', flyer_url, category_name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
          'Pending');
     
     -- Return the new event_id (optional)
