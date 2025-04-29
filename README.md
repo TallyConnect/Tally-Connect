@@ -123,6 +123,7 @@ This data dictionary defines the structure, attributes, and constraints of the T
 Source the files for the MySQL database in this order:
 - procedures.sql
 - users.sql
+- categories.sql
 - events.sql
 - eventlist.sql
 - eventRegistrations.sql
