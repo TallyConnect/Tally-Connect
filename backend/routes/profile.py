@@ -62,3 +62,22 @@ def update_profile():
     session["user"]["user_preferences"] = new_preferences
 
     return jsonify({"message": "Profile updated successfully", "user": session["user"]})
+
+@profile_bp.route('/profile/warnings', methods=['GET'])
+def get_user_warnings():
+    if "user" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    username = session["user"]["user_name"]
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT warning_reason, warning_status, warning_issued_by, warning_date_issued, warning_resolution
+        FROM warnings
+        WHERE user_name = %s
+        ORDER BY warning_date_issued DESC
+    """, (username,))
+    warnings = cursor.fetchall()
+    db.close()
+
+    return jsonify({"warnings": warnings})

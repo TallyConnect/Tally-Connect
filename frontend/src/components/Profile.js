@@ -83,6 +83,7 @@ function Profile() {
         user_preferences: ""
     });
     const [categories, setCategories] = useState([]);
+    const [warnings, setWarnings] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -101,6 +102,10 @@ function Profile() {
         axios.get("http://127.0.0.1:5000/api/categories")
             .then(res => setCategories(res.data.categories || []))
             .catch(() => console.error("Failed to load categories."));
+
+        axios.get("http://127.0.0.1:5000/api/profile/warnings", { withCredentials: true })
+            .then(res => setWarnings(res.data.warnings || []))
+            .catch(() => console.error("Failed to load warnings"));
     }, []);
 
     const handleChange = (e) => {
@@ -118,7 +123,7 @@ function Profile() {
                 setUser(response.data.user);
                 setEditing(false);
             })
-            .catch(err => {
+            .catch(() => {
                 setError("Update failed.");
             });
     };
@@ -182,8 +187,39 @@ function Profile() {
                 <button onClick={() => setEditing(true)} style={{ marginTop: "20px" }}>Edit Profile</button>
             )}
 
+            {warnings.length > 0 && (
+                <div style={{ marginTop: "30px" }}>
+                    <h3>Admin Warnings</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Issued By</th>
+                                <th>Date Issued</th>
+                                <th>Resolved?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {warnings.map((warn, idx) => (
+                                <tr key={idx}>
+                                    <td>{warn.warning_reason}</td>
+                                    <td>{warn.warning_status}</td>
+                                    <td>{warn.warning_issued_by}</td>
+                                    <td>{new Date(warn.warning_date_issued).toLocaleString()}</td>
+                                    <td>{warn.warning_resolution ? "Yes" : "No"}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
             <div style={{ marginTop: "20px" }}>
-                <button onClick={handleSignOut} style={{ padding: "10px", backgroundColor: "red", color: "white", border: "none", cursor: "pointer" }}>
+                <button
+                    onClick={handleSignOut}
+                    style={{ padding: "10px", backgroundColor: "red", color: "white", border: "none", cursor: "pointer" }}
+                >
                     Sign Out
                 </button>
             </div>
