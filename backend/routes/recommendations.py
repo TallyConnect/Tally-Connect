@@ -44,7 +44,9 @@ def recommended_events():
                            e.event_date, e.event_time, e.flyer_url
                     FROM events e
                     JOIN event_tags et ON e.event_id = et.event_id
-                    WHERE et.tag_id = %s
+                    WHERE et.tag_id = %s 
+                      AND e.event_status = 'Scheduled' 
+                      AND e.moderator_approval = 'Approved'
                 """
                 cursor.execute(events_query, (category_id,))
                 events_result = cursor.fetchall()
