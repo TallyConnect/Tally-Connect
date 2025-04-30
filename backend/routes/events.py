@@ -67,7 +67,7 @@ def upload_flyer():
         return jsonify({"error": "Invalid event_date format"}), 400
 
     event_time = request.form.get("event_time")
-    category_id = request.form.get("category_id")  # This will be a JSON string
+    category_id = request.form.get("category_id")  # JSON stringified list
 
     # Validate required fields
     if not file or not user_name or not event_title or not event_description or not event_location or not event_date or not event_time or not category_id:
@@ -77,30 +77,60 @@ def upload_flyer():
     if not allowed_file(file.filename):
         return jsonify({"error": "Invalid file type"}), 400
 
-    # Parse category_id
+    # Parse category_id list
     try:
-        category_ids = json.loads(category_id)  # Parse it into a Python list
+        category_ids = json.loads(category_id)
+        if not category_ids:
+            return jsonify({"error": "At least one category is required."}), 400
     except json.JSONDecodeError:
         return jsonify({"error": "Invalid category_id format"}), 400
 
-    # Save the file
-    event_id = str(uuid.uuid4())[:8]
-    filename = f"{event_id}_{secure_filename(file.filename)}"
-    flyer_path = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(flyer_path)
-    flyer_url = f"/static/flyers/{filename}"
+    # Use the first category ID (for now)
+    primary_category_id = category_ids[0]
 
+    # Lookup category name from category ID
     try:
         db = get_db_connection()
         cursor = db.cursor()
+        cursor.execute("SELECT category_name FROM event_categories WHERE category_id = %s", (primary_category_id,))
+        category_result = cursor.fetchone()
+        if not category_result:
+            return jsonify({"error": "Invalid category ID provided."}), 400
+        category_name = category_result[0]
+    except Exception as e:
+        print("Error looking up category name:", e)
+        return jsonify({"error": "Failed to look up category name"}), 500
 
-        # Insert the event into the database
-        cursor.execute("""
-            INSERT INTO events (event_id, user_name, event_title, event_description, event_location, event_date, event_time, event_status, flyer_url, moderator_approval)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (event_id, user_name, event_title, event_description, event_location, event_date, event_time, 'Draft', flyer_url, 'Pending'))
+    # Save the file
+    unique_filename = f"{str(uuid.uuid4())[:8]}_{secure_filename(file.filename)}"
+    flyer_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+    file.save(flyer_path)
+    flyer_url = f"/static/flyers/{unique_filename}"
 
-        # Insert category IDs into the event_tags table
+    try:
+        # Call the stored procedure to insert the event
+        cursor.callproc("insert_event", (
+            user_name,
+            event_title,
+            event_description,
+            event_location,
+            event_date,
+            event_time,
+            'Draft',
+            flyer_url,
+            category_name,
+            'Pending'
+        ))
+
+        # Retrieve the generated event ID
+        for result in cursor.stored_results():
+            event_id_row = result.fetchone()
+            event_id = event_id_row[0] if event_id_row else None
+
+        if not event_id:
+            return jsonify({"error": "Failed to retrieve event ID from procedure."}), 500
+
+        # Insert all selected category IDs into event_tags
         for cat_id in category_ids:
             cursor.execute("""
                 INSERT INTO event_tags (event_id, tag_id)
@@ -111,11 +141,16 @@ def upload_flyer():
         cursor.close()
         db.close()
 
-        return jsonify({"message": "Flyer uploaded and event created!", "event_id": event_id, "flyer_url": flyer_url}), 200
+        return jsonify({
+            "message": "Flyer uploaded and event created!",
+            "event_id": event_id,
+            "flyer_url": flyer_url
+        }), 200
 
     except Exception as e:
         print("Error in /upload_flyer:", e)
         return jsonify({"error": "Internal server error"}), 500
+
 
 @events_bp.route('/events', methods=['GET'])
 def get_events():
@@ -175,6 +210,10 @@ def delete_event(event_id):
     event = cursor.fetchone()
 
     if event:
+        # First delete related event_tags
+        cursor.execute("DELETE FROM event_tags WHERE event_id = %s", (event_id,))
+        
+        # Then delete the event
         cursor.execute("DELETE FROM events WHERE event_id = %s", (event_id,))
         db.commit()
         db.close()
@@ -182,6 +221,7 @@ def delete_event(event_id):
     else:
         db.close()
         return jsonify({"error": "Event not found"}), 404
+
 
 @events_bp.route('/events/<event_id>', methods=['PUT'])
 def update_event(event_id):
@@ -206,9 +246,14 @@ def update_event(event_id):
         db.close()
         return jsonify({"error": "Event not found or unauthorized"}), 404
     
-    tz = pytz.timezone('UTC')  # Ensure that the event date is stored in UTC
-    event_datetime = datetime.combine(event_date, datetime.min.time())
-    event_datetime = tz.localize(event_datetime)
+        event_date = datetime.strptime(request.form.get("event_date"), "%Y-%m-%d").date()
+    event_time_str = request.form.get("event_time")
+
+# Combine into datetime object assuming it's from local time (e.g., US/Eastern)
+    eastern = pytz.timezone('US/Eastern')
+    event_time = datetime(2025, 3, 1, 12, 0)  # naive time
+    localized_time = eastern.localize(event_time)
+    event_time = localized_time.astimezone(pytz.utc).time()  # convert to UTC
 
     cursor.execute("""
         UPDATE events SET event_title = %s, event_description = %s, event_location = %s,
@@ -218,7 +263,7 @@ def update_event(event_id):
         event_title,
         event_description,
         event_location,
-        event_datetime,
+        event_date,
         event_time,
         event_id
     ))

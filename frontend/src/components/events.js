@@ -36,6 +36,8 @@ const [showTagsDropdown, setShowTagsDropdown] = useState(false);
 const [showCreateCategory, setShowCreateCategory] = useState(false);
 const [newCategory, setNewCategory] = useState("");
 const dropdownRef = useRef(null);
+const date = new Date('2025-03-01T12:00:00-05:00'); // -05:00 = EST
+
 
 // Automatically close the dropdown when clicking outside
 useEffect(() => {
